@@ -1,10 +1,13 @@
 import pytest
 
 from babel.generators.base import BookConfig
-from babel.generators.fixed_sentence import FixedSentenceGenerator
-from babel.generators.no_adjacent_punctuation import NoAdjacentPunctuationGenerator
-from babel.generators.pos_template import POSTemplateGenerator
-from babel.generators.unrestricted_words import UnrestrictedWordsGenerator
+from babel.generators.borges_library import BorgesLibraryGenerator
+from babel.generators.word_based import WordBasedGenerator
+from babel.generators.punctuation_constrained import PunctuationConstrainedGenerator
+from babel.generators.sentence_structured import SentenceStructuredGenerator
+from babel.generators.grammar_constrained import GrammarConstrainedGenerator
+from babel.generators.semantic_constrained import SemanticConstrainedGenerator
+from babel.generators.topic_coherent import TopicCoherentGenerator
 
 
 def _make_config(mode_id: str, seed: str, demo_punctuation) -> BookConfig:
@@ -21,10 +24,13 @@ def _make_config(mode_id: str, seed: str, demo_punctuation) -> BookConfig:
 @pytest.mark.parametrize(
     ("GeneratorClass", "mode_id"),
     [
-        (UnrestrictedWordsGenerator, "unrestricted-words"),
-        (FixedSentenceGenerator, "fixed-sentence"),
-        (NoAdjacentPunctuationGenerator, "no-adjacent-punctuation"),
-        (POSTemplateGenerator, "pos-template"),
+        (BorgesLibraryGenerator, "borges-library"),
+        (WordBasedGenerator, "word-based"),
+        (SentenceStructuredGenerator, "sentence-structured"),
+        (PunctuationConstrainedGenerator, "punctuation-constrained"),
+        (GrammarConstrainedGenerator, "grammar-constrained"),
+        (SemanticConstrainedGenerator, "semantic-constrained"),
+        (TopicCoherentGenerator, "topic-coherent"),
     ],
 )
 def test_same_seed_same_page(GeneratorClass, mode_id, demo_words, demo_punctuation):
@@ -38,10 +44,13 @@ def test_same_seed_same_page(GeneratorClass, mode_id, demo_words, demo_punctuati
 @pytest.mark.parametrize(
     ("GeneratorClass", "mode_id"),
     [
-        (UnrestrictedWordsGenerator, "unrestricted-words"),
-        (FixedSentenceGenerator, "fixed-sentence"),
-        (NoAdjacentPunctuationGenerator, "no-adjacent-punctuation"),
-        (POSTemplateGenerator, "pos-template"),
+        (BorgesLibraryGenerator, "borges-library"),
+        (WordBasedGenerator, "word-based"),
+        (SentenceStructuredGenerator, "sentence-structured"),
+        (PunctuationConstrainedGenerator, "punctuation-constrained"),
+        (GrammarConstrainedGenerator, "grammar-constrained"),
+        (SemanticConstrainedGenerator, "semantic-constrained"),
+        (TopicCoherentGenerator, "topic-coherent"),
     ],
 )
 def test_different_seeds_different_pages(
@@ -58,10 +67,13 @@ def test_different_seeds_different_pages(
 @pytest.mark.parametrize(
     ("GeneratorClass", "mode_id"),
     [
-        (UnrestrictedWordsGenerator, "unrestricted-words"),
-        (FixedSentenceGenerator, "fixed-sentence"),
-        (NoAdjacentPunctuationGenerator, "no-adjacent-punctuation"),
-        (POSTemplateGenerator, "pos-template"),
+        (BorgesLibraryGenerator, "borges-library"),
+        (WordBasedGenerator, "word-based"),
+        (SentenceStructuredGenerator, "sentence-structured"),
+        (PunctuationConstrainedGenerator, "punctuation-constrained"),
+        (GrammarConstrainedGenerator, "grammar-constrained"),
+        (SemanticConstrainedGenerator, "semantic-constrained"),
+        (TopicCoherentGenerator, "topic-coherent"),
     ],
 )
 def test_different_page_indices(GeneratorClass, mode_id, demo_words, demo_punctuation):

@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 
 from babel.generators.base import BookConfig, GeneratedPage, LibraryGenerator
 from babel.rendering.page_renderer import render_tokens
@@ -15,16 +16,16 @@ BUILTIN_POS_VOCAB: dict[str, list[str]] = {
 DEFAULT_TEMPLATE = ["DET", "ADJ", "NOUN", "VERB", "DET", "NOUN", "PUNCT"]
 
 
-class POSTemplateGenerator(LibraryGenerator):
-    mode_id = "pos-template"
-    display_name = "POS Template"
+class GrammarConstrainedGenerator(LibraryGenerator):
+    mode_id = "grammar-constrained"
+    display_name = "Grammar-Constrained Library"
 
     def __init__(
         self,
         words: list[str],
         punctuation: list[str],
-        template: list[str] | None = None,
-        pos_vocab: dict[str, list[str]] | None = None,
+        template: Optional[list[str]] = None,
+        pos_vocab: dict[str, Optional[list[str]]] = None,
     ) -> None:
         super().__init__(words, punctuation)
         self.template = template or DEFAULT_TEMPLATE

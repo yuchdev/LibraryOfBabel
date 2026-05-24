@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 
 from babel.generators.base import BookConfig, GeneratedPage, LibraryGenerator
 from babel.rendering.page_renderer import render_tokens
@@ -8,16 +9,16 @@ WORDS_PER_SENTENCE = 15
 SENTENCE_END_PUNCTUATION = [".", "?", "!"]
 
 
-class FixedSentenceGenerator(LibraryGenerator):
-    mode_id = "fixed-sentence"
-    display_name = "Fixed Sentence"
+class SentenceStructuredGenerator(LibraryGenerator):
+    mode_id = "sentence-structured"
+    display_name = "Sentence-Structured Library"
 
     def __init__(
         self,
         words: list[str],
         punctuation: list[str],
         words_per_sentence: int = WORDS_PER_SENTENCE,
-        sentence_end_punctuation: list[str] | None = None,
+        sentence_end_punctuation: Optional[list[str]] = None,
     ) -> None:
         super().__init__(words, punctuation)
         self.words_per_sentence = words_per_sentence

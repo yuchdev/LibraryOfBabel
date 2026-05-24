@@ -1,4 +1,5 @@
 """Known vocabulary source registry."""
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -7,8 +8,8 @@ class VocabularySource(BaseModel):
     source_id: str
     display_name: str
     homepage_url: str
-    download_url: str | None = None
-    license_name: str | None = None
+    download_url: Optional[str] = None
+    license_name: Optional[str] = None
     local_subdir: str
     expected_files: list[str]
     notes: str
@@ -49,7 +50,7 @@ KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
         display_name="wordfreq English Top 25 000",
         homepage_url="https://github.com/aparrish/wordfreq-en-25000",
         download_url=(
-            "https://raw.githubusercontent.com/aparrish/wordfreq-en-25000/master/wordfreq-en-25000.json"
+            "https://raw.githubusercontent.com/aparrish/wordfreq-en-25000/refs/heads/main/wordfreq-en-25000-log.json"
         ),
         license_name="CC BY 4.0 / wordfreq license",
         local_subdir="wordfreq",

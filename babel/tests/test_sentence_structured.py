@@ -1,13 +1,13 @@
 import math
 
 from babel.generators.base import BookConfig
-from babel.generators.fixed_sentence import WORDS_PER_SENTENCE, FixedSentenceGenerator
+from babel.generators.sentence_structured import WORDS_PER_SENTENCE, SentenceStructuredGenerator
 
 
 def test_fixed_sentence_structure(demo_words, demo_punctuation):
-    gen = FixedSentenceGenerator(demo_words, demo_punctuation)
+    gen = SentenceStructuredGenerator(demo_words, demo_punctuation)
     config = BookConfig(
-        mode_id="fixed-sentence",
+        mode_id="sentence-structured",
         seed="test-seed",
         pages=10,
         tokens_per_page=160,
@@ -28,7 +28,7 @@ def test_fixed_sentence_structure(demo_words, demo_punctuation):
 
 
 def test_fixed_sentence_log10_size(demo_words, demo_punctuation):
-    gen = FixedSentenceGenerator(demo_words, demo_punctuation)
+    gen = SentenceStructuredGenerator(demo_words, demo_punctuation)
     log10_sz = gen.log10_size(pages=1, tokens_per_page=16)
     expected = 15 * math.log10(len(demo_words)) + math.log10(3)
     assert abs(log10_sz - expected) < 0.01

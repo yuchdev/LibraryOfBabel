@@ -5,9 +5,9 @@ from babel.rendering.page_renderer import render_tokens
 from babel.utils.hashing import deterministic_index
 
 
-class UnrestrictedWordsGenerator(LibraryGenerator):
-    mode_id = "unrestricted-words"
-    display_name = "Unrestricted Word-Token"
+class WordBasedGenerator(LibraryGenerator):
+    mode_id = "word-based"
+    display_name = "Word-Based Library"
 
     def log10_size(self, pages: int = 410, tokens_per_page: int = 320) -> float:
         """(W + P)^N"""

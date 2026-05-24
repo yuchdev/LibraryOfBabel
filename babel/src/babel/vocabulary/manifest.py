@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -17,7 +18,7 @@ class InstalledVocabulary(BaseModel):
     word_count: int
     installed_at: str
     source_url: str
-    license_name: str | None
+    license_name: Optional[str]
     sha256: str
 
 

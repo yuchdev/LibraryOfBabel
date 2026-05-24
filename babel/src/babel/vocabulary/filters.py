@@ -1,7 +1,10 @@
+from typing import Optional
+
+
 def filter_words(
     words: list[str],
     min_length: int = 1,
-    max_length: int | None = None,
+    max_length: Optional[int] = None,
     allow_digits: bool = True,
 ) -> list[str]:
     """Filter vocabulary by length and character constraints."""

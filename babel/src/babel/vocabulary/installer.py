@@ -6,6 +6,7 @@ import hashlib
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Optional
 
 from babel.config import DEFAULT_CACHE_DIR, DEFAULT_MANIFEST, DEFAULT_VOCAB_DIR
 from babel.vocabulary.manifest import InstalledVocabulary, load_manifest, register_vocabulary
@@ -187,7 +188,7 @@ def _extract_words_from_csv(path: Path) -> list[str]:
     words: list[str] = []
     text = path.read_text(encoding="utf-8", errors="replace")
     reader = csv.reader(text.splitlines())
-    header: list[str] | None = None
+    header: Optional[list[str]] = None
     word_col = 0
     for row in reader:
         if not row:

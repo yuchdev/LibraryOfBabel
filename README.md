@@ -87,6 +87,8 @@ The Library of Babel contains every possible book of 410 pages, each page having
 
 This PoC models the library using word tokens instead of characters, exploring how different grammatical constraints affect the library's size.
 
+See the detailed model description in [docs/math-model.md](docs/math-model.md).
+
 ### Dataset Preparation
 
 The app will automatically look for installed vocabularies in:

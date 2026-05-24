@@ -1,12 +1,12 @@
 from babel.generators.base import BookConfig
-from babel.generators.no_adjacent_punctuation import NoAdjacentPunctuationGenerator
+from babel.generators.punctuation_constrained import PunctuationConstrainedGenerator
 
 
 def test_no_adjacent_punctuation(demo_words, demo_punctuation):
-    gen = NoAdjacentPunctuationGenerator(demo_words, demo_punctuation)
+    gen = PunctuationConstrainedGenerator(demo_words, demo_punctuation)
     punct_set = set(demo_punctuation)
     config = BookConfig(
-        mode_id="no-adjacent-punctuation",
+        mode_id="punctuation-constrained",
         seed="test-seed",
         pages=10,
         tokens_per_page=100,

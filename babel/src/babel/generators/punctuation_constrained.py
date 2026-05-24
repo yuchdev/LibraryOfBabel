@@ -4,9 +4,9 @@ from babel.rendering.page_renderer import render_tokens
 from babel.utils.hashing import deterministic_index
 
 
-class NoAdjacentPunctuationGenerator(LibraryGenerator):
-    mode_id = "no-adjacent-punctuation"
-    display_name = "No Adjacent Punctuation"
+class PunctuationConstrainedGenerator(LibraryGenerator):
+    mode_id = "punctuation-constrained"
+    display_name = "Punctuation-Constrained Library"
 
     def log10_size(self, pages: int = 410, tokens_per_page: int = 320) -> float:
         n = pages * tokens_per_page

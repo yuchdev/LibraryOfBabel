@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
 
 from babel.config import DEFAULT_VOCAB_DIR
 
@@ -27,19 +28,19 @@ def find_default_vocabularies(base_dir: Path = DEFAULT_VOCAB_DIR) -> list[Path]:
 
 
 def resolve_vocabulary_path(
-    explicit_path: Path | None,
-    preferred_source: str | None = None,
+    explicit_path: Optional[Path],
+    preferred_source: Optional[str] = None,
     auto_download: bool = False,
 ) -> Path:
     """
     Resolve the vocabulary path to use, following this priority:
 
     1. *explicit_path* — if provided and exists, use it directly.
-    2. *preferred_source* sub-directory inside the default vocab dir.
+    2. *preferred_source* subdirectory inside the default vocab dir.
     3. Any usable vocabulary file found in the default vocab dir.
     4. If *auto_download* is True, trigger installation of the preferred (or
        first known) source and return its path.
-    5. Raise a :class:`VocabularyNotFoundError` with actionable instructions.
+    5. Raise a :class: `VocabularyNotFoundError` with actionable instructions.
     """
     # 1. Explicit path wins
     if explicit_path is not None:

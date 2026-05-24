@@ -5,6 +5,7 @@ from __future__ import annotations
 import urllib.error
 import urllib.request
 from pathlib import Path
+from typing import Optional
 
 from rich.progress import (
     BarColumn,
@@ -40,7 +41,7 @@ def download_file(
             headers={"User-Agent": "babel-poc/0.1 vocabulary-downloader"},
         )
         with urllib.request.urlopen(req, timeout=60) as response:  # noqa: S310
-            total_bytes: int | None = None
+            total_bytes: Optional[int] = None
             content_length = response.headers.get("Content-Length")
             if content_length:
                 try:
@@ -76,7 +77,7 @@ def download_file(
 _CHUNK = 65_536  # 64 KiB
 
 
-def _download_with_progress(response: object, dest: Path, total: int | None, label: str) -> None:
+def _download_with_progress(response: object, dest: Path, total: Optional[int], label: str) -> None:
     progress = Progress(
         TextColumn("[bold blue]{task.description}"),
         BarColumn(),

@@ -118,7 +118,7 @@ def test_page_without_vocab_finds_installed(
 
     result = runner.invoke(
         app,
-        ["page", "--mode", "fixed-sentence", "--seed", "test", "--page", "0"],
+        ["page", "--mode", "sentence-structured", "--seed", "test", "--page", "0"],
     )
     assert result.exit_code == 0
     assert "Page" in result.output
@@ -135,6 +135,6 @@ def test_page_without_vocab_no_default_shows_error(
 
     monkeypatch.setattr(disc, "DEFAULT_VOCAB_DIR", empty_dir)
 
-    result = runner.invoke(app, ["page", "--mode", "fixed-sentence"])
+    result = runner.invoke(app, ["page", "--mode", "sentence-structured"])
     assert result.exit_code != 0
     assert "setup-vocab" in result.output

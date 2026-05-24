@@ -12,7 +12,7 @@ import pytest
 from babel.vocabulary.downloader import download_file
 
 
-def _make_response(body: bytes, content_length: int | None = None) -> MagicMock:
+def _make_response(body: bytes, content_length: Optionsl[int] = None) -> MagicMock:
     """Create a mock HTTP response object."""
     response = MagicMock()
     stream = io.BytesIO(body)

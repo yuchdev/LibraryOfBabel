@@ -27,7 +27,7 @@ def test_metrics_command(runner, demo_vocab_file):
         [
             "metrics",
             "--mode",
-            "unrestricted-words",
+            "word-based",
             "--vocab",
             str(demo_vocab_file),
         ],
@@ -42,7 +42,7 @@ def test_page_command(runner, demo_vocab_file):
         [
             "page",
             "--mode",
-            "fixed-sentence",
+            "sentence-structured",
             "--vocab",
             str(demo_vocab_file),
             "--seed",

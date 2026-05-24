@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+import sys
+from typer.main import get_command
 from rich.console import Console
 from rich.table import Table
 
@@ -17,10 +19,13 @@ from babel.constants import (
     UNIVERSE_ATOMS_LOG10,
 )
 from babel.generators.base import BookConfig, LibraryGenerator
-from babel.generators.fixed_sentence import FixedSentenceGenerator
-from babel.generators.no_adjacent_punctuation import NoAdjacentPunctuationGenerator
-from babel.generators.pos_template import POSTemplateGenerator
-from babel.generators.unrestricted_words import UnrestrictedWordsGenerator
+from babel.generators.borges_library import BorgesLibraryGenerator
+from babel.generators.word_based import WordBasedGenerator
+from babel.generators.punctuation_constrained import PunctuationConstrainedGenerator
+from babel.generators.sentence_structured import SentenceStructuredGenerator
+from babel.generators.grammar_constrained import GrammarConstrainedGenerator
+from babel.generators.semantic_constrained import SemanticConstrainedGenerator
+from babel.generators.topic_coherent import TopicCoherentGenerator
 from babel.mathlib.logmath import scientific_from_log10
 from babel.mathlib.metrics import calculate_metrics
 from babel.rendering.page_renderer import wrap_text
@@ -64,11 +69,51 @@ def _resolve_vocab(
 
 def _make_generators(words: list[str], punctuation: list[str]) -> list[LibraryGenerator]:
     return [
-        UnrestrictedWordsGenerator(words, punctuation),
-        NoAdjacentPunctuationGenerator(words, punctuation),
-        FixedSentenceGenerator(words, punctuation),
-        POSTemplateGenerator(words, punctuation),
+        BorgesLibraryGenerator(words, punctuation),
+        WordBasedGenerator(words, punctuation),
+        PunctuationConstrainedGenerator(words, punctuation),
+        SentenceStructuredGenerator(words, punctuation),
+        GrammarConstrainedGenerator(words, punctuation),
+        SemanticConstrainedGenerator(words, punctuation),
+        TopicCoherentGenerator(words, punctuation),
     ]
+
+
+@app.callback(invoke_without_command=True)
+def main(
+    ctx: typer.Context,
+) -> None:
+    """Main callback to handle custom help displaying all subcommand options."""
+    if ctx.invoked_subcommand is None:
+        # If the user didn't provide a subcommand, we show the full help by default.
+        # But if they specifically asked for --help, Typer's default handler will
+        # already have been triggered if we didn't disable it.
+        # Since we want to display all sub-options for --help as well,
+        # we can use a custom help formatter.
+        pass
+
+def _patch_typer_help() -> None:
+    """Patch Typer to show all subcommand options in the main help message."""
+    original_get_command = typer.main.get_command
+
+    def patched_get_command(typer_app: typer.Typer) -> any:
+        click_command = original_get_command(typer_app)
+        original_format_help = click_command.format_help
+
+        def patched_format_help(ctx: any, formatter: any) -> None:
+            original_format_help(ctx, formatter)
+            for name, command in click_command.commands.items():
+                console.print(f"\n[bold]{'='*20} {name} {'='*20}[/bold]")
+                with typer.Context(command, info_name=name, parent=ctx) as sub_ctx:
+                    console.print(sub_ctx.get_help())
+
+        click_command.format_help = patched_format_help
+        return click_command
+
+    typer.main.get_command = patched_get_command
+
+
+_patch_typer_help()
 
 
 @app.command("info")
@@ -92,19 +137,13 @@ def cmd_info() -> None:
 
     console.print("\n[bold]Available Modes[/bold]")
     modes = [
-        (
-            "unrestricted-words",
-            "Each token can be any word or punctuation independently.",
-        ),
-        (
-            "no-adjacent-punctuation",
-            "No two punctuation tokens appear consecutively.",
-        ),
-        (
-            "fixed-sentence",
-            "Every sentence has exactly 15 words + end punctuation.",
-        ),
-        ("pos-template", "Tokens follow a POS template (DET ADJ NOUN VERB ...)."),
+        ("borges-library", "Character-based original model (English alphabet)."),
+        ("word-based", "Each token can be any word or punctuation independently."),
+        ("punctuation-constrained", "No two punctuation tokens appear consecutively."),
+        ("sentence-structured", "Fixed-length sentences (15 words + end punct)."),
+        ("grammar-constrained", "Tokens follow a POS template."),
+        ("semantic-constrained", "Tokens are connected via semantic clusters."),
+        ("topic-coherent", "Each book is restricted to a thematic manifold."),
     ]
     for mode_id, desc in modes:
         console.print(f"  [cyan]{mode_id}[/cyan]  — {desc}")
@@ -138,7 +177,7 @@ def cmd_vocab_info(
 
 @app.command("metrics")
 def cmd_metrics(
-    mode: str = typer.Option("unrestricted-words", "--mode", help="Generation mode"),
+    mode: str = typer.Option("word-based", "--mode", help="Generation mode"),
     vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
     vocab_source: Optional[str] = typer.Option(
         None, "--vocab-source", help="Installed vocabulary source ID"
@@ -185,7 +224,7 @@ def cmd_metrics(
 
 @app.command("page")
 def cmd_page(
-    mode: str = typer.Option("fixed-sentence", "--mode", help="Generation mode"),
+    mode: str = typer.Option("sentence-structured", "--mode", help="Generation mode"),
     vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
     vocab_source: Optional[str] = typer.Option(
         None, "--vocab-source", help="Installed vocabulary source ID"
@@ -258,7 +297,7 @@ def cmd_compare(
 
     bm, be = scientific_from_log10(BORGES_LOG10_SIZE)
     table.add_row(
-        "Original Borges",
+        "Borges (1941 Edition)",
         f"{BORGES_LOG10_SIZE:,.0f}",
         f"~{bm:.2f} × 10^{be:,}",
         "baseline",
