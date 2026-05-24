@@ -175,7 +175,9 @@ def _extract_words_from_txt(path: Path) -> list[str]:
         token = line.strip()
         if token and not token.startswith("#"):
             # Take only the first whitespace-delimited token
-            words.append(token.split()[0])
+            parts = token.split()
+            if parts:
+                words.append(parts[0])
     return words
 
 
@@ -205,9 +207,12 @@ def _extract_words_from_csv(path: Path) -> list[str]:
     return words
 
 
+_SHA256_CHUNK = 65_536
+
+
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(65536), b""):
+        for chunk in iter(lambda: fh.read(_SHA256_CHUNK), b""):
             h.update(chunk)
     return h.hexdigest()
