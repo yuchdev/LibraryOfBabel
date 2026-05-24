@@ -9,14 +9,14 @@ Never make HTTP requests during normal execution. All vocabulary, computation, a
 Never generate all pages of a book in memory. Only generate the requested page. A book config is just metadata (seed, mode, page count).
 
 ### 3. Deterministic Generation
-Use `deterministic_uint64(seed, namespace, position)` from `babel_poc.utils.hashing`. Never use Python's `hash()` (randomized between processes) or `random.seed()` for deterministic output.
+Use `deterministic_uint64(seed, namespace, position)` from `babel.utils.hashing`. Never use Python's `hash()` (randomized between processes) or `random.seed()` for deterministic output.
 
 ### 4. Log-Space Math
-Never compute gigantic integers. Use `log10_*` functions from `babel_poc.mathlib.logmath`.
+Never compute gigantic integers. Use `log10_*` functions from `babel.mathlib.logmath`.
 
 ## How to Add a New Generator Mode
 
-1. Create `src/babel_poc/generators/your_mode.py`
+1. Create `src/babel/generators/your_mode.py`
 2. Implement `YourModeGenerator(LibraryGenerator)` with:
    - `mode_id: str` (kebab-case, CLI-friendly)
    - `display_name: str`
@@ -44,4 +44,4 @@ Do not hide network access inside `metrics`, `page`, or `compare`.
 
 Normal runtime is local-only by default (`--no-auto-download`).
 
-Use `babel_poc.progress.progress_context` for any operation on large data. Progress bars are transient (disappear after completion).
+Use `babel.progress.progress_context` for any operation on large data. Progress bars are transient (disappear after completion).

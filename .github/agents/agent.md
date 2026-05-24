@@ -2,7 +2,7 @@
 
 ## Primary Goal
 
-Make minimal, correct changes that align with the existing `babel_poc` architecture and deterministic behavior.
+Make minimal, correct changes that align with the existing `babel` architecture and deterministic behavior.
 
 ## Working Agreement
 
@@ -14,14 +14,14 @@ Make minimal, correct changes that align with the existing `babel_poc` architect
 
 ## Repository Map
 
-- Python package: `babel_poc/src/babel_poc`
-- Tests: `babel_poc/tests`
+- Python package: `babel/src/babel`
+- Tests: `babel/tests`
 - Repository guidance: `AGENTS.md`
-- PoC-specific guidance: `babel_poc/AGENTS.md`
+- PoC-specific guidance: `babel/AGENTS.md`
 
 ## Validation
 
-Before finishing, run from `babel_poc/`:
+Before finishing, run from `babel/`:
 
 ```bash
 ruff check .

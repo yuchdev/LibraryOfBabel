@@ -1,18 +1,18 @@
 # LibraryOfBabel
 
-This repository currently contains `babel_poc`, a local-first Python proof of concept for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
+This repository currently contains `babel`, a local-first Python proof of concept for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
 
 ## Dependencies and Setup
 
 ### Repository Layout
 
-- `babel_poc/src/babel_poc` — application source code
-- `babel_poc/tests` — automated tests
-- `babel_poc/README.md` — detailed project usage notes and CLI examples
+- `babel/src/babel` — application source code
+- `babel/tests` — automated tests
+- `babel/README.md` — detailed project usage notes and CLI examples
 
 ### Dependencies
 
-The `babel_poc` package targets **Python 3.11+** and is defined in `babel_poc/pyproject.toml`.
+The `babel` package targets **Python 3.11+** and is defined in `babel/pyproject.toml`.
 
 ### Runtime dependencies
 
@@ -43,7 +43,7 @@ This installs the package in editable mode so local source changes are picked up
 
 ### Bring the App to a Working State (Vocabulary Initialization)
 
-Most commands expect an installed vocabulary. After setup, initialize at least one source:
+Most commands expect installed vocabulary. After setup, initialize at least one source:
 
 ```bash
 # Optional: inspect available sources
@@ -57,7 +57,7 @@ This installs vocabulary files under `~/.local/share/library-of-babel/vocabulary
 
 ### Testing and Validation
 
-Run all validation commands from the `babel_poc/` directory:
+Run all validation commands from the `babel/` directory:
 
 ```bash
 ruff check .
@@ -73,7 +73,7 @@ What each command covers:
 
 ### CI
 
-GitHub Actions runs the test suite from `.github/workflows/ci.yml` on pushes to `main` and on pull requests. The workflow installs the package from `babel_poc/` and runs:
+GitHub Actions runs the test suite from `.github/workflows/ci.yml` on pushes to `main` and on pull requests. The workflow installs the package from `babel/` and runs:
 
 ```bash
 pytest -q

@@ -24,10 +24,10 @@ dev = [
 ]
 
 [project.scripts]
-babel-poc = "babel_poc.cli:app"
+babel-poc = "babel.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/babel_poc"]
+packages = ["src/babel"]
 
 [tool.ruff]
 line-length = 100
