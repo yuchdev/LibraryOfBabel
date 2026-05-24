@@ -1,0 +1,379 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Optional
+
+import typer
+from rich.console import Console
+from rich.table import Table
+
+from babel.constants import (
+    BORGES_ALPHABET_SIZE,
+    BORGES_CHAR_SLOTS,
+    BORGES_LOG10_SIZE,
+    BORGES_PAGES,
+    DEFAULT_PUNCTUATION,
+    OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10,
+    UNIVERSE_ATOMS_LOG10,
+)
+from babel.generators.base import BookConfig, LibraryGenerator
+from babel.generators.fixed_sentence import FixedSentenceGenerator
+from babel.generators.no_adjacent_punctuation import NoAdjacentPunctuationGenerator
+from babel.generators.pos_template import POSTemplateGenerator
+from babel.generators.unrestricted_words import UnrestrictedWordsGenerator
+from babel.mathlib.logmath import scientific_from_log10
+from babel.mathlib.metrics import calculate_metrics
+from babel.rendering.page_renderer import wrap_text
+from babel.vocabulary.discovery import VocabularyNotFoundError, resolve_vocabulary_path
+from babel.vocabulary.installer import install_all_sources, install_source
+from babel.vocabulary.loader import load_words
+from babel.vocabulary.models import VocabularyInfo
+from babel.vocabulary.normalizer import normalize_words
+
+app = typer.Typer(
+    name="babel-poc",
+    help="Local Python PoC for Progressive Library of Babel Reduction.",
+    add_completion=False,
+)
+console = Console()
+
+
+def _load_vocab(vocab_path: Path) -> tuple[list[str], list[str]]:
+    """Load and normalize vocabulary, return (words, punctuation)."""
+    raw = load_words(vocab_path)
+    words = normalize_words(raw, lowercase=True, reject_spaces=True)
+    return words, DEFAULT_PUNCTUATION
+
+
+def _resolve_vocab(
+    vocab: Optional[Path],
+    vocab_source: Optional[str],
+    auto_download: bool,
+) -> Path:
+    """Resolve vocabulary path; print actionable error and exit on failure."""
+    try:
+        return resolve_vocabulary_path(
+            explicit_path=vocab,
+            preferred_source=vocab_source,
+            auto_download=auto_download,
+        )
+    except VocabularyNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1) from exc
+
+
+def _make_generators(words: list[str], punctuation: list[str]) -> list[LibraryGenerator]:
+    return [
+        UnrestrictedWordsGenerator(words, punctuation),
+        NoAdjacentPunctuationGenerator(words, punctuation),
+        FixedSentenceGenerator(words, punctuation),
+        POSTemplateGenerator(words, punctuation),
+    ]
+
+
+@app.command("info")
+def cmd_info() -> None:
+    """Print Borges base size, universe constants, and available modes."""
+    console.rule("[bold]Library of Babel — PoC Info[/bold]")
+    m, e = scientific_from_log10(BORGES_LOG10_SIZE)
+    console.print("\n[bold]Borges Original Library[/bold]")
+    console.print(f"  Pages per book    : {BORGES_PAGES}")
+    console.print(f"  Alphabet size     : {BORGES_ALPHABET_SIZE}")
+    console.print(f"  Character slots   : {BORGES_CHAR_SLOTS:,}")
+    console.print(f"  log10(size)       : {BORGES_LOG10_SIZE:,.5f}")
+    console.print(f"  Size              : ~{m:.3f} × 10^{e:,}")
+
+    console.print("\n[bold]Universe Constants[/bold]")
+    console.print(f"  Atoms in obs. universe  : ~10^{UNIVERSE_ATOMS_LOG10:.0f}")
+    console.print(
+        "  Planck volumes          : "
+        f"~10^{OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10:.0f}"
+    )
+
+    console.print("\n[bold]Available Modes[/bold]")
+    modes = [
+        (
+            "unrestricted-words",
+            "Each token can be any word or punctuation independently.",
+        ),
+        (
+            "no-adjacent-punctuation",
+            "No two punctuation tokens appear consecutively.",
+        ),
+        (
+            "fixed-sentence",
+            "Every sentence has exactly 15 words + end punctuation.",
+        ),
+        ("pos-template", "Tokens follow a POS template (DET ADJ NOUN VERB ...)."),
+    ]
+    for mode_id, desc in modes:
+        console.print(f"  [cyan]{mode_id}[/cyan]  — {desc}")
+
+
+@app.command("vocab-info")
+def cmd_vocab_info(
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+) -> None:
+    """Print vocabulary statistics."""
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download=False)
+    words, punctuation = _load_vocab(resolved)
+    info = VocabularyInfo(
+        vocabulary_id=resolved.stem,
+        path=resolved,
+        word_count=len(words),
+        punctuation_count=len(punctuation),
+        normalized=True,
+        lowercase=True,
+    )
+    console.rule(f"[bold]Vocabulary: {resolved}[/bold]")
+    console.print(f"  Words loaded      : {info.word_count:,}")
+    console.print(f"  Punctuation marks : {info.punctuation_count}")
+    console.print(f"  Normalized        : {info.normalized}")
+    console.print(f"  Lowercase         : {info.lowercase}")
+    console.print(f"  Punctuation       : {DEFAULT_PUNCTUATION}")
+
+
+@app.command("metrics")
+def cmd_metrics(
+    mode: str = typer.Option("unrestricted-words", "--mode", help="Generation mode"),
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+    auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
+    tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
+    pages: int = typer.Option(410, "--pages"),
+) -> None:
+    """Calculate and display Library size metrics."""
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download)
+    generators = _generators_by_id(*_load_vocab(resolved))
+    if mode not in generators:
+        console.print(f"[red]Unknown mode: {mode}. Choose from: {list(generators)}[/red]")
+        raise typer.Exit(1)
+    gen = generators[mode]
+    log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
+    metrics = calculate_metrics(mode, log10_sz)
+
+    console.rule(f"[bold]Metrics — {gen.display_name}[/bold]")
+    console.print(f"  Mode              : {metrics.mode_id}")
+    console.print(f"  log10(size)       : {metrics.log10_size:,.5f}")
+    console.print(f"  Size              : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
+    if metrics.log10_smaller_than_borges > 0:
+        console.print(
+            "  vs Borges         : "
+            f"10^{metrics.log10_smaller_than_borges:,.0f} times [red]smaller[/red]"
+        )
+    else:
+        console.print(
+            "  vs Borges         : "
+            f"10^{-metrics.log10_smaller_than_borges:,.0f} times [green]larger[/green]"
+        )
+    if metrics.log10_larger_than_universe_atoms > 0:
+        console.print(
+            "  vs universe atoms : "
+            f"10^{metrics.log10_larger_than_universe_atoms:,.0f} times [green]larger[/green]"
+        )
+    else:
+        console.print(
+            "  vs universe atoms : "
+            f"10^{-metrics.log10_larger_than_universe_atoms:,.0f} times [red]smaller[/red]"
+        )
+
+
+@app.command("page")
+def cmd_page(
+    mode: str = typer.Option("fixed-sentence", "--mode", help="Generation mode"),
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+    auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
+    seed: str = typer.Option("demo-seed", "--seed", help="Book seed"),
+    page: int = typer.Option(0, "--page", help="Page index (0-based)"),
+    tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
+    pages: int = typer.Option(410, "--pages"),
+) -> None:
+    """Generate and display one page from a deterministic book."""
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download)
+    generators = _generators_by_id(*_load_vocab(resolved))
+    if mode not in generators:
+        console.print(f"[red]Unknown mode: {mode}[/red]")
+        raise typer.Exit(1)
+    gen = generators[mode]
+    config = BookConfig(
+        mode_id=mode,
+        seed=seed,
+        pages=pages,
+        tokens_per_page=tokens_per_page,
+        vocabulary_id=resolved.stem,
+        punctuation=list(DEFAULT_PUNCTUATION),
+    )
+    log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
+    metrics = calculate_metrics(mode, log10_sz)
+    generated = gen.generate_page(config, page)
+
+    console.rule(f"[bold]Library of Babel — Page {page}[/bold]")
+    console.print(f"\n[bold]Mode:[/bold]  {gen.display_name}")
+    console.print("\n[bold]Book:[/bold]")
+    console.print(f"  seed           : {seed}")
+    console.print(f"  page           : {page} / {pages}")
+    console.print(f"  tokens per page: {tokens_per_page}")
+    console.print("\n[bold]Metrics:[/bold]")
+    console.print(f"  Library size   : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
+    if metrics.log10_smaller_than_borges > 0:
+        console.print(
+            "  Smaller than Borges : "
+            f"10^{metrics.log10_smaller_than_borges:,.0f}"
+        )
+    console.print("\n[bold]Page:[/bold]")
+    console.print(wrap_text(generated.text, width=80))
+
+
+@app.command("compare")
+def cmd_compare(
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+    auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
+    _seed: str = typer.Option("demo-seed", "--seed"),
+    _page: int = typer.Option(0, "--page"),
+    tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
+    pages: int = typer.Option(410, "--pages"),
+) -> None:
+    """Compare all modes in a table."""
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download)
+    words, punctuation = _load_vocab(resolved)
+    generators = _make_generators(words, punctuation)
+
+    table = Table(title="Library of Babel — Mode Comparison", show_lines=True)
+    table.add_column("Mode", style="cyan")
+    table.add_column("log10(size)", justify="right")
+    table.add_column("Size (scientific)", justify="right")
+    table.add_column("vs Borges", justify="right")
+    table.add_column("vs Universe atoms", justify="right")
+
+    bm, be = scientific_from_log10(BORGES_LOG10_SIZE)
+    table.add_row(
+        "Original Borges",
+        f"{BORGES_LOG10_SIZE:,.0f}",
+        f"~{bm:.2f} × 10^{be:,}",
+        "baseline",
+        f"10^{BORGES_LOG10_SIZE - UNIVERSE_ATOMS_LOG10:,.0f} larger",
+    )
+
+    from babel.progress.progress import progress_context
+
+    with progress_context("Calculating metrics", len(generators)) as prog:
+        for gen in generators:
+            log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
+            metrics = calculate_metrics(gen.mode_id, log10_sz)
+            vs_borges = (
+                f"10^{metrics.log10_smaller_than_borges:,.0f} smaller"
+                if metrics.log10_smaller_than_borges > 0
+                else f"10^{-metrics.log10_smaller_than_borges:,.0f} larger"
+            )
+            vs_atoms = (
+                f"10^{metrics.log10_larger_than_universe_atoms:,.0f} larger"
+                if metrics.log10_larger_than_universe_atoms > 0
+                else f"10^{-metrics.log10_larger_than_universe_atoms:,.0f} smaller"
+            )
+            table.add_row(
+                gen.display_name,
+                f"{metrics.log10_size:,.0f}",
+                f"~{metrics.mantissa:.2f} × 10^{metrics.exponent:,}",
+                vs_borges,
+                vs_atoms,
+            )
+            prog.advance(1)
+
+    console.print(table)
+
+
+@app.command("vocab-list-sources")
+def cmd_vocab_list_sources() -> None:
+    """List all known vocabulary sources and their installation status."""
+    from babel.config import DEFAULT_VOCAB_DIR
+    from babel.vocabulary.sources import KNOWN_VOCABULARY_SOURCES
+
+    table = Table(title="Known Vocabulary Sources", show_lines=True)
+    table.add_column("Source ID", style="cyan")
+    table.add_column("Display Name")
+    table.add_column("Status")
+    table.add_column("Local Path")
+    table.add_column("License")
+    table.add_column("Homepage")
+
+    for source_id, src in KNOWN_VOCABULARY_SOURCES.items():
+        words_file = DEFAULT_VOCAB_DIR / src.local_subdir / "words.txt"
+        if words_file.exists() and words_file.stat().st_size > 0:
+            status = "[green]installed[/green]"
+            local_path = str(words_file)
+        else:
+            status = "[yellow]missing[/yellow]"
+            local_path = ""
+        table.add_row(
+            source_id,
+            src.display_name,
+            status,
+            local_path,
+            src.license_name or "—",
+            src.homepage_url,
+        )
+
+    console.print(table)
+    console.print(
+        "\nTo install a source:  [cyan]babel-poc setup-vocab --source SOURCE_ID[/cyan]"
+    )
+    console.print("To install all:       [cyan]babel-poc setup-vocab --all[/cyan]")
+
+
+@app.command("setup-vocab")
+def cmd_setup_vocab(
+    source: Optional[str] = typer.Option(None, "--source", help="Source ID to install"),
+    all_sources: bool = typer.Option(False, "--all", help="Install all available sources"),
+    force: bool = typer.Option(False, "--force", help="Re-download even if already installed"),
+) -> None:
+    """Download and install vocabulary sources."""
+    from babel.vocabulary.sources import KNOWN_VOCABULARY_SOURCES
+
+    if not source and not all_sources:
+        console.print(
+            "[red]Specify --source SOURCE_ID or --all.[/red]\n"
+            "Available sources: " + ", ".join(KNOWN_VOCABULARY_SOURCES)
+        )
+        raise typer.Exit(1)
+
+    if all_sources:
+        console.print("[bold]Installing all available vocabulary sources…[/bold]")
+        results = install_all_sources(force=force)
+        for entry in results:
+            console.print(
+                f"  [green]✔[/green]  {entry.vocabulary_id}  "
+                f"({entry.word_count:,} words)  →  {entry.path}"
+            )
+        if not results:
+            console.print("[yellow]No sources with automatic download URLs found.[/yellow]")
+    else:
+        assert source is not None
+        console.print(f"[bold]Installing vocabulary source: {source}[/bold]")
+        try:
+            entry = install_source(source, force=force)
+        except (ValueError, NotImplementedError) as exc:
+            console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(1) from exc
+        console.print(
+            f"  [green]✔[/green]  {entry.vocabulary_id}  "
+            f"({entry.word_count:,} words)  →  {entry.path}"
+        )
+
+
+def _generators_by_id(words: list[str], punctuation: list[str]) -> dict[str, LibraryGenerator]:
+    return {generator.mode_id: generator for generator in _make_generators(words, punctuation)}
+
+
+if __name__ == "__main__":
+    app()
