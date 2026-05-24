@@ -39,6 +39,20 @@ python -m pip install -e ".[dev]"
 
 This installs the package in editable mode so local source changes are picked up immediately.
 
+## Bring the App to a Working State (Vocabulary Initialization)
+
+Most commands expect an installed vocabulary. After setup, initialize at least one source:
+
+```bash
+# Optional: inspect available sources
+babel-poc vocab-list-sources
+
+# Recommended default source
+babel-poc setup-vocab --source wordfreq_25k
+```
+
+This installs vocabulary files under `~/.local/share/library-of-babel/vocabulary/`.
+
 ## Testing and Validation
 
 Run all validation commands from the `babel_poc/` directory:
