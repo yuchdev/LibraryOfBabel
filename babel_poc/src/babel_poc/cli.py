@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Optional
 
 import typer
 from rich.console import Console
@@ -21,6 +24,8 @@ from babel_poc.generators.unrestricted_words import UnrestrictedWordsGenerator
 from babel_poc.mathlib.logmath import scientific_from_log10
 from babel_poc.mathlib.metrics import calculate_metrics
 from babel_poc.rendering.page_renderer import wrap_text
+from babel_poc.vocabulary.discovery import VocabularyNotFoundError, resolve_vocabulary_path
+from babel_poc.vocabulary.installer import install_all_sources, install_source
 from babel_poc.vocabulary.loader import load_words
 from babel_poc.vocabulary.models import VocabularyInfo
 from babel_poc.vocabulary.normalizer import normalize_words
@@ -38,6 +43,23 @@ def _load_vocab(vocab_path: Path) -> tuple[list[str], list[str]]:
     raw = load_words(vocab_path)
     words = normalize_words(raw, lowercase=True, reject_spaces=True)
     return words, DEFAULT_PUNCTUATION
+
+
+def _resolve_vocab(
+    vocab: Optional[Path],
+    vocab_source: Optional[str],
+    auto_download: bool,
+) -> Path:
+    """Resolve vocabulary path; print actionable error and exit on failure."""
+    try:
+        return resolve_vocabulary_path(
+            explicit_path=vocab,
+            preferred_source=vocab_source,
+            auto_download=auto_download,
+        )
+    except VocabularyNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1) from exc
 
 
 def _make_generators(words: list[str], punctuation: list[str]) -> list[LibraryGenerator]:
@@ -90,22 +112,23 @@ def cmd_info() -> None:
 
 @app.command("vocab-info")
 def cmd_vocab_info(
-    vocab: Path = typer.Option(..., "--vocab", help="Path to vocabulary file"),
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
 ) -> None:
     """Print vocabulary statistics."""
-    if not vocab.exists():
-        console.print(f"[red]Vocabulary file not found: {vocab}[/red]")
-        raise typer.Exit(1)
-    words, punctuation = _load_vocab(vocab)
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download=False)
+    words, punctuation = _load_vocab(resolved)
     info = VocabularyInfo(
-        vocabulary_id=vocab.stem,
-        path=vocab,
+        vocabulary_id=resolved.stem,
+        path=resolved,
         word_count=len(words),
         punctuation_count=len(punctuation),
         normalized=True,
         lowercase=True,
     )
-    console.rule(f"[bold]Vocabulary: {vocab}[/bold]")
+    console.rule(f"[bold]Vocabulary: {resolved}[/bold]")
     console.print(f"  Words loaded      : {info.word_count:,}")
     console.print(f"  Punctuation marks : {info.punctuation_count}")
     console.print(f"  Normalized        : {info.normalized}")
@@ -116,15 +139,17 @@ def cmd_vocab_info(
 @app.command("metrics")
 def cmd_metrics(
     mode: str = typer.Option("unrestricted-words", "--mode", help="Generation mode"),
-    vocab: Path = typer.Option(..., "--vocab", help="Path to vocabulary file"),
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+    auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
     tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
     pages: int = typer.Option(410, "--pages"),
 ) -> None:
     """Calculate and display Library size metrics."""
-    if not vocab.exists():
-        console.print(f"[red]Vocabulary file not found: {vocab}[/red]")
-        raise typer.Exit(1)
-    generators = _generators_by_id(*_load_vocab(vocab))
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download)
+    generators = _generators_by_id(*_load_vocab(resolved))
     if mode not in generators:
         console.print(f"[red]Unknown mode: {mode}. Choose from: {list(generators)}[/red]")
         raise typer.Exit(1)
@@ -161,17 +186,19 @@ def cmd_metrics(
 @app.command("page")
 def cmd_page(
     mode: str = typer.Option("fixed-sentence", "--mode", help="Generation mode"),
-    vocab: Path = typer.Option(..., "--vocab", help="Path to vocabulary file"),
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+    auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
     seed: str = typer.Option("demo-seed", "--seed", help="Book seed"),
     page: int = typer.Option(0, "--page", help="Page index (0-based)"),
     tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
     pages: int = typer.Option(410, "--pages"),
 ) -> None:
     """Generate and display one page from a deterministic book."""
-    if not vocab.exists():
-        console.print(f"[red]Vocabulary file not found: {vocab}[/red]")
-        raise typer.Exit(1)
-    generators = _generators_by_id(*_load_vocab(vocab))
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download)
+    generators = _generators_by_id(*_load_vocab(resolved))
     if mode not in generators:
         console.print(f"[red]Unknown mode: {mode}[/red]")
         raise typer.Exit(1)
@@ -181,7 +208,7 @@ def cmd_page(
         seed=seed,
         pages=pages,
         tokens_per_page=tokens_per_page,
-        vocabulary_id=vocab.stem,
+        vocabulary_id=resolved.stem,
         punctuation=list(DEFAULT_PUNCTUATION),
     )
     log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
@@ -207,17 +234,19 @@ def cmd_page(
 
 @app.command("compare")
 def cmd_compare(
-    vocab: Path = typer.Option(..., "--vocab", help="Path to vocabulary file"),
+    vocab: Optional[Path] = typer.Option(None, "--vocab", help="Path to vocabulary file"),
+    vocab_source: Optional[str] = typer.Option(
+        None, "--vocab-source", help="Installed vocabulary source ID"
+    ),
+    auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
     _seed: str = typer.Option("demo-seed", "--seed"),
     _page: int = typer.Option(0, "--page"),
     tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
     pages: int = typer.Option(410, "--pages"),
 ) -> None:
     """Compare all modes in a table."""
-    if not vocab.exists():
-        console.print(f"[red]Vocabulary file not found: {vocab}[/red]")
-        raise typer.Exit(1)
-    words, punctuation = _load_vocab(vocab)
+    resolved = _resolve_vocab(vocab, vocab_source, auto_download)
+    words, punctuation = _load_vocab(resolved)
     generators = _make_generators(words, punctuation)
 
     table = Table(title="Library of Babel — Mode Comparison", show_lines=True)
@@ -262,6 +291,84 @@ def cmd_compare(
             prog.advance(1)
 
     console.print(table)
+
+
+@app.command("vocab-list-sources")
+def cmd_vocab_list_sources() -> None:
+    """List all known vocabulary sources and their installation status."""
+    from babel_poc.config import DEFAULT_VOCAB_DIR
+    from babel_poc.vocabulary.sources import KNOWN_VOCABULARY_SOURCES
+
+    table = Table(title="Known Vocabulary Sources", show_lines=True)
+    table.add_column("Source ID", style="cyan")
+    table.add_column("Display Name")
+    table.add_column("Status")
+    table.add_column("Local Path")
+    table.add_column("License")
+    table.add_column("Homepage")
+
+    for source_id, src in KNOWN_VOCABULARY_SOURCES.items():
+        words_file = DEFAULT_VOCAB_DIR / src.local_subdir / "words.txt"
+        if words_file.exists() and words_file.stat().st_size > 0:
+            status = "[green]installed[/green]"
+            local_path = str(words_file)
+        else:
+            status = "[yellow]missing[/yellow]"
+            local_path = ""
+        table.add_row(
+            source_id,
+            src.display_name,
+            status,
+            local_path,
+            src.license_name or "—",
+            src.homepage_url,
+        )
+
+    console.print(table)
+    console.print(
+        "\nTo install a source:  [cyan]babel-poc setup-vocab --source SOURCE_ID[/cyan]"
+    )
+    console.print("To install all:       [cyan]babel-poc setup-vocab --all[/cyan]")
+
+
+@app.command("setup-vocab")
+def cmd_setup_vocab(
+    source: Optional[str] = typer.Option(None, "--source", help="Source ID to install"),
+    all_sources: bool = typer.Option(False, "--all", help="Install all available sources"),
+    force: bool = typer.Option(False, "--force", help="Re-download even if already installed"),
+) -> None:
+    """Download and install vocabulary sources."""
+    from babel_poc.vocabulary.sources import KNOWN_VOCABULARY_SOURCES
+
+    if not source and not all_sources:
+        console.print(
+            "[red]Specify --source SOURCE_ID or --all.[/red]\n"
+            "Available sources: " + ", ".join(KNOWN_VOCABULARY_SOURCES)
+        )
+        raise typer.Exit(1)
+
+    if all_sources:
+        console.print("[bold]Installing all available vocabulary sources…[/bold]")
+        results = install_all_sources(force=force)
+        for entry in results:
+            console.print(
+                f"  [green]✔[/green]  {entry.vocabulary_id}  "
+                f"({entry.word_count:,} words)  →  {entry.path}"
+            )
+        if not results:
+            console.print("[yellow]No sources with automatic download URLs found.[/yellow]")
+    else:
+        assert source is not None
+        console.print(f"[bold]Installing vocabulary source: {source}[/bold]")
+        try:
+            entry = install_source(source, force=force)
+        except (ValueError, NotImplementedError) as exc:
+            console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(1) from exc
+        console.print(
+            f"  [green]✔[/green]  {entry.vocabulary_id}  "
+            f"({entry.word_count:,} words)  →  {entry.path}"
+        )
 
 
 def _generators_by_id(words: list[str], punctuation: list[str]) -> dict[str, LibraryGenerator]:

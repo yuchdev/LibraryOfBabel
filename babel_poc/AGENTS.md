@@ -33,6 +33,15 @@ Never compute gigantic integers. Use `log10_*` functions from `babel_poc.mathlib
 - No-adjacent-punctuation generator must be tested for the adjacency invariant
 - Fixed-sentence generator must be tested for sentence structure
 
-## Progress Bars
+## Local-Only Runtime Policy
+
+Runtime commands (`metrics`, `page`, `compare`) must not download data unless:
+
+* the user explicitly runs `setup-vocab`, or
+* the user passes `--auto-download`.
+
+Do not hide network access inside `metrics`, `page`, or `compare`.
+
+Normal runtime is local-only by default (`--no-auto-download`).
 
 Use `babel_poc.progress.progress_context` for any operation on large data. Progress bars are transient (disappear after completion).
