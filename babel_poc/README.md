@@ -17,14 +17,35 @@ pip install -e ".[dev]"
 
 ## Dataset Preparation
 
-Place a vocabulary file at `data/vocabulary/english.txt` (one word per line).
+The app will automatically look for installed vocabularies in:
 
-Recommended free sources:
+```
+~/.local/share/library-of-babel/vocabulary/
+```
 
-- **SCOWL / English Wordlist**: https://wordlist.aspell.net/
-- **WordNet / Open English WordNet**: https://wordnet.princeton.edu/
-- **wordfreq**: `pip install wordfreq` then export
-- **Kaggle English word frequency**: https://www.kaggle.com/datasets/rtatman/english-word-frequency
+### Installing vocabularies (recommended)
+
+```bash
+# List all known vocabulary sources and their installation status
+babel-poc vocab-list-sources
+
+# Install the wordfreq top-25k English vocabulary (auto-download)
+babel-poc setup-vocab --source wordfreq_25k
+
+# Install all sources that have an automatic download URL
+babel-poc setup-vocab --all
+
+# Re-install a source (overwrite existing)
+babel-poc setup-vocab --source wordfreq_25k --force
+```
+
+### Manual vocabulary
+
+You can also pass a vocabulary file path directly on any command:
+
+```bash
+babel-poc metrics --vocab /path/to/words.txt
+```
 
 A small demo vocabulary is included at `data/vocabulary/demo.txt`.
 
@@ -34,17 +55,29 @@ A small demo vocabulary is included at `data/vocabulary/demo.txt`.
 # Show info
 babel-poc info
 
-# Vocabulary statistics
+# List known vocabulary sources
+babel-poc vocab-list-sources
+
+# Install default vocabulary (auto-download)
+babel-poc setup-vocab --source wordfreq_25k
+
+# Vocabulary statistics (uses installed vocabulary automatically)
+babel-poc vocab-info
+
+# Or with an explicit file
 babel-poc vocab-info --vocab data/vocabulary/demo.txt
 
-# Metrics for a specific mode
+# Metrics for a specific mode (uses installed vocabulary)
+babel-poc metrics --mode unrestricted-words
+
+# Or with an explicit vocab file
 babel-poc metrics --mode unrestricted-words --vocab data/vocabulary/demo.txt
 
-# Generate page 3 of a deterministic book
-babel-poc page --mode fixed-sentence --vocab data/vocabulary/demo.txt --seed "my-book" --page 3
+# Generate page 3 of a deterministic book (uses installed vocabulary)
+babel-poc page --mode fixed-sentence --seed "my-book" --page 3
 
-# Compare all modes
-babel-poc compare --vocab data/vocabulary/demo.txt
+# Compare all modes (uses installed vocabulary)
+babel-poc compare
 ```
 
 ## Implemented Modes
