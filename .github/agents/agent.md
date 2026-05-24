@@ -16,7 +16,8 @@ Make minimal, correct changes that align with the existing `babel_poc` architect
 
 - Python package: `babel_poc/src/babel_poc`
 - Tests: `babel_poc/tests`
-- Existing project guidance: `babel_poc/AGENTS.md`
+- Repository guidance: `AGENTS.md`
+- PoC-specific guidance: `babel_poc/AGENTS.md`
 
 ## Validation
 
