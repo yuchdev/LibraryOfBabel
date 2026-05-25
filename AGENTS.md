@@ -23,7 +23,7 @@ Never compute gigantic integers. Use `log10_*` functions from `babel.mathlib.log
    - `log10_size(pages, tokens_per_page) -> float`
    - `generate_token(seed, position) -> str`
    - `generate_page(config, page_index) -> GeneratedPage`
-3. Register in `cli.py` → `_make_generators()`
+3. Register in `src/babel/cli.py` → `_make_generators()`
 4. Add tests in `tests/`
 
 ## Testing Rules

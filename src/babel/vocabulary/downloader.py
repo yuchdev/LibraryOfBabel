@@ -38,7 +38,7 @@ def download_file(
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "babel-poc/0.1 vocabulary-downloader"},
+            headers={"User-Agent": "library-of-babel/0.1 vocabulary-downloader"},
         )
         with urllib.request.urlopen(req, timeout=60) as response:  # noqa: S310
             total_bytes: Optional[int] = None

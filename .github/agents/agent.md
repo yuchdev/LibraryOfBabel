@@ -14,14 +14,13 @@ Make minimal, correct changes that align with the existing `babel` architecture 
 
 ## Repository Map
 
-- Python package: `babel/src/babel`
-- Tests: `babel/tests`
+- Python package: `src/babel`
+- Tests: `tests`
 - Repository guidance: `AGENTS.md`
-- PoC-specific guidance: `babel/AGENTS.md`
 
 ## Validation
 
-Before finishing, run from `babel/`:
+Before finishing, run from the repository root:
 
 ```bash
 ruff check .

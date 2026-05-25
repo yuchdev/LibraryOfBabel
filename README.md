@@ -1,18 +1,18 @@
 # LibraryOfBabel
 
-This repository currently contains `babel`, a local-first Python proof of concept for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
+This repository currently contains a local-first Python proof of concept for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
 
 ## Dependencies and Setup
 
 ### Repository Layout
 
-- `babel/src/babel` — application source code
-- `babel/tests` — automated tests
-- `babel/README.md` — detailed project usage notes and CLI examples
+- `src/babel` — application source code
+- `tests` — automated tests
+- `README.md` — detailed project usage notes and CLI examples
 
 ### Dependencies
 
-The `babel` package targets **Python 3.11+** and is defined in `babel/pyproject.toml`.
+The `babel` package targets **Python 3.11+** and is defined in `pyproject.toml`.
 
 ### Runtime dependencies
 
@@ -35,7 +35,6 @@ Install everything, including development tools, with the editable setup below.
 From the repository root:
 
 ```bash
-cd babel
 python -m pip install -e ".[dev]"
 ```
 
@@ -47,17 +46,17 @@ Most commands expect installed vocabulary. After setup, initialize at least one 
 
 ```bash
 # Optional: inspect available sources
-babel-poc vocab-list-sources
+library-of-babel vocab-list-sources
 
 # Recommended default source
-babel-poc setup-vocab --source wordfreq_25k
+library-of-babel setup-vocab --source wordfreq_25k
 ```
 
 This installs vocabulary files under `~/.local/share/library-of-babel/vocabulary/`.
 
 ### Testing and Validation
 
-Run all validation commands from the `babel/` directory:
+Run all validation commands from the repository root:
 
 ```bash
 ruff check .
@@ -73,7 +72,7 @@ What each command covers:
 
 ### CI
 
-GitHub Actions runs the test suite from `.github/workflows/ci.yml` on pushes to `main` and on pull requests. The workflow installs the package from `babel/` and runs:
+GitHub Actions runs the test suite from `.github/workflows/ci.yml` on pushes to `main` and on pull requests. The workflow installs the package and runs:
 
 ```bash
 pytest -q
@@ -101,16 +100,16 @@ The app will automatically look for installed vocabularies in:
 
 ```bash
 # List all known vocabulary sources and their installation status
-babel-poc vocab-list-sources
+library-of-babel vocab-list-sources
 
 # Install the wordfreq top-25k English vocabulary (auto-download)
-babel-poc setup-vocab --source wordfreq_25k
+library-of-babel setup-vocab --source wordfreq_25k
 
 # Install all sources that have an automatic download URL
-babel-poc setup-vocab --all
+library-of-babel setup-vocab --all
 
 # Re-install a source (overwrite existing)
-babel-poc setup-vocab --source wordfreq_25k --force
+library-of-babel setup-vocab --source wordfreq_25k --force
 ```
 
 ### Manual vocabulary
@@ -118,7 +117,7 @@ babel-poc setup-vocab --source wordfreq_25k --force
 You can also pass a vocabulary file path directly on any command:
 
 ```bash
-babel-poc metrics --vocab /path/to/words.txt
+library-of-babel metrics --vocab /path/to/words.txt
 ```
 
 A small demo vocabulary is included at `data/vocabulary/demo.txt`.
@@ -127,31 +126,31 @@ A small demo vocabulary is included at `data/vocabulary/demo.txt`.
 
 ```bash
 # Show info
-babel-poc info
+library-of-babel info
 
 # List known vocabulary sources
-babel-poc vocab-list-sources
+library-of-babel vocab-list-sources
 
 # Install default vocabulary (auto-download)
-babel-poc setup-vocab --source wordfreq_25k
+library-of-babel setup-vocab --source wordfreq_25k
 
 # Vocabulary statistics (uses installed vocabulary automatically)
-babel-poc vocab-info
+library-of-babel vocab-info
 
 # Or with an explicit file
-babel-poc vocab-info --vocab data/vocabulary/demo.txt
+library-of-babel vocab-info --vocab data/vocabulary/demo.txt
 
 # Metrics for a specific mode (uses installed vocabulary)
-babel-poc metrics --mode unrestricted-words
+library-of-babel metrics --mode unrestricted-words
 
 # Or with an explicit vocab file
-babel-poc metrics --mode unrestricted-words --vocab data/vocabulary/demo.txt
+library-of-babel metrics --mode unrestricted-words --vocab data/vocabulary/demo.txt
 
 # Generate page 3 of a deterministic book (uses installed vocabulary)
-babel-poc page --mode fixed-sentence --seed "my-book" --page 3
+library-of-babel page --mode fixed-sentence --seed "my-book" --page 3
 
 # Compare all modes (uses installed vocabulary)
-babel-poc compare
+library-of-babel compare
 ```
 
 ### Implemented Modes

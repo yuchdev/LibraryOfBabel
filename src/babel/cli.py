@@ -36,7 +36,7 @@ from babel.vocabulary.models import VocabularyInfo
 from babel.vocabulary.normalizer import normalize_words
 
 app = typer.Typer(
-    name="babel-poc",
+    name="library-of-babel",
     help="Local Python PoC for Progressive Library of Babel Reduction.",
     add_completion=False,
 )
@@ -183,7 +183,7 @@ def cmd_metrics(
         None, "--vocab-source", help="Installed vocabulary source ID"
     ),
     auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
-    tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
+    tokens_per_page: Optional[int] = typer.Option(None, "--tokens-per-page"),
     pages: int = typer.Option(410, "--pages"),
 ) -> None:
     """Calculate and display Library size metrics."""
@@ -193,6 +193,11 @@ def cmd_metrics(
         console.print(f"[red]Unknown mode: {mode}. Choose from: {list(generators)}[/red]")
         raise typer.Exit(1)
     gen = generators[mode]
+
+    # Default tokens_per_page: 3200 for Borges, 320 for others
+    if tokens_per_page is None:
+        tokens_per_page = 3200 if mode == "borges-library" else 320
+
     log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
     metrics = calculate_metrics(mode, log10_sz)
 
@@ -200,7 +205,9 @@ def cmd_metrics(
     console.print(f"  Mode              : {metrics.mode_id}")
     console.print(f"  log10(size)       : {metrics.log10_size:,.5f}")
     console.print(f"  Size              : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
-    if metrics.log10_smaller_than_borges > 0:
+    if abs(metrics.log10_smaller_than_borges) < 0.1:
+        console.print("  vs Borges         : [green]equal[/green]")
+    elif metrics.log10_smaller_than_borges > 0:
         console.print(
             "  vs Borges         : "
             f"10^{metrics.log10_smaller_than_borges:,.0f} times [red]smaller[/red]"
@@ -221,6 +228,17 @@ def cmd_metrics(
             f"10^{-metrics.log10_larger_than_universe_atoms:,.0f} times [red]smaller[/red]"
         )
 
+    if metrics.log10_larger_than_planck_volumes > 0:
+        console.print(
+            "  vs universe Planck volumes: "
+            f"10^{metrics.log10_larger_than_planck_volumes:,.0f} times [green]larger[/green]"
+        )
+    else:
+        console.print(
+            "  vs universe Planck volumes: "
+            f"10^{-metrics.log10_larger_than_planck_volumes:,.0f} times [red]smaller[/red]"
+        )
+
 
 @app.command("page")
 def cmd_page(
@@ -232,7 +250,7 @@ def cmd_page(
     auto_download: bool = typer.Option(False, "--auto-download/--no-auto-download"),
     seed: str = typer.Option("demo-seed", "--seed", help="Book seed"),
     page: int = typer.Option(0, "--page", help="Page index (0-based)"),
-    tokens_per_page: int = typer.Option(320, "--tokens-per-page"),
+    tokens_per_page: Optional[int] = typer.Option(None, "--tokens-per-page"),
     pages: int = typer.Option(410, "--pages"),
 ) -> None:
     """Generate and display one page from a deterministic book."""
@@ -242,6 +260,11 @@ def cmd_page(
         console.print(f"[red]Unknown mode: {mode}[/red]")
         raise typer.Exit(1)
     gen = generators[mode]
+
+    # Default tokens_per_page: 3200 for Borges, 320 for others
+    if tokens_per_page is None:
+        tokens_per_page = 3200 if mode == "borges-library" else 320
+
     config = BookConfig(
         mode_id=mode,
         seed=seed,
@@ -262,7 +285,9 @@ def cmd_page(
     console.print(f"  tokens per page: {tokens_per_page}")
     console.print("\n[bold]Metrics:[/bold]")
     console.print(f"  Library size   : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
-    if metrics.log10_smaller_than_borges > 0:
+    if abs(metrics.log10_smaller_than_borges) < 0.1:
+        console.print("  Size vs Borges : [green]equal[/green]")
+    elif metrics.log10_smaller_than_borges > 0:
         console.print(
             "  Smaller than Borges : "
             f"10^{metrics.log10_smaller_than_borges:,.0f}"
@@ -294,6 +319,7 @@ def cmd_compare(
     table.add_column("Size (scientific)", justify="right")
     table.add_column("vs Borges", justify="right")
     table.add_column("vs Universe atoms", justify="right")
+    table.add_column("vs Planck volumes", justify="right")
 
     bm, be = scientific_from_log10(BORGES_LOG10_SIZE)
     table.add_row(
@@ -302,23 +328,38 @@ def cmd_compare(
         f"~{bm:.2f} × 10^{be:,}",
         "baseline",
         f"10^{BORGES_LOG10_SIZE - UNIVERSE_ATOMS_LOG10:,.0f} larger",
+        f"10^{BORGES_LOG10_SIZE - OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10:,.0f} larger",
     )
 
     from babel.progress.progress import progress_context
 
     with progress_context("Calculating metrics", len(generators)) as prog:
         for gen in generators:
-            log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
+            # Default tokens_per_page: 3200 for Borges, 320 for others
+            current_tpp = tokens_per_page
+            if current_tpp == 320 and gen.mode_id == "borges-library":
+                current_tpp = 3200
+
+            log10_sz = gen.log10_size(pages=pages, tokens_per_page=current_tpp)
             metrics = calculate_metrics(gen.mode_id, log10_sz)
-            vs_borges = (
-                f"10^{metrics.log10_smaller_than_borges:,.0f} smaller"
-                if metrics.log10_smaller_than_borges > 0
-                else f"10^{-metrics.log10_smaller_than_borges:,.0f} larger"
-            )
+            
+            if abs(metrics.log10_smaller_than_borges) < 0.1:
+                vs_borges = "equal"
+            else:
+                vs_borges = (
+                    f"10^{metrics.log10_smaller_than_borges:,.0f} smaller"
+                    if metrics.log10_smaller_than_borges > 0
+                    else f"10^{-metrics.log10_smaller_than_borges:,.0f} larger"
+                )
             vs_atoms = (
                 f"10^{metrics.log10_larger_than_universe_atoms:,.0f} larger"
                 if metrics.log10_larger_than_universe_atoms > 0
                 else f"10^{-metrics.log10_larger_than_universe_atoms:,.0f} smaller"
+            )
+            vs_planck = (
+                f"10^{metrics.log10_larger_than_planck_volumes:,.0f} larger"
+                if metrics.log10_larger_than_planck_volumes > 0
+                else f"10^{-metrics.log10_larger_than_planck_volumes:,.0f} smaller"
             )
             table.add_row(
                 gen.display_name,
@@ -326,6 +367,7 @@ def cmd_compare(
                 f"~{metrics.mantissa:.2f} × 10^{metrics.exponent:,}",
                 vs_borges,
                 vs_atoms,
+                vs_planck,
             )
             prog.advance(1)
 
@@ -365,9 +407,9 @@ def cmd_vocab_list_sources() -> None:
 
     console.print(table)
     console.print(
-        "\nTo install a source:  [cyan]babel-poc setup-vocab --source SOURCE_ID[/cyan]"
+        "\nTo install a source:  [cyan]library-of-babel setup-vocab --source SOURCE_ID[/cyan]"
     )
-    console.print("To install all:       [cyan]babel-poc setup-vocab --all[/cyan]")
+    console.print("To install all:       [cyan]library-of-babel setup-vocab --all[/cyan]")
 
 
 @app.command("setup-vocab")

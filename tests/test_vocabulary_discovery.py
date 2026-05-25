@@ -150,7 +150,7 @@ def test_resolve_no_vocab_raises_actionable_error(
 
     msg = str(exc_info.value)
     assert "setup-vocab" in msg
-    assert "babel-poc" in msg
+    assert "library-of-babel" in msg
 
 
 def test_setup_hint_contains_setup_command() -> None:

@@ -2,23 +2,22 @@
 
 - **Environment**: This project requires Python 3.11 or higher.
 - **Package Manager**: Uses `hatchling` as the build backend.
-- **Setup**: To set up the development environment, navigate to the `babel/` directory and install the package in editable mode with development dependencies:
+- **Setup**: To set up the development environment, navigate to the repository root and install the package in editable mode with development dependencies:
   ```bash
-  cd babel
   python -m pip install -e ".[dev]"
   ```
-- **Structure**: The source code is located in `babel/src/babel/`. Note that the package name for imports is `babel`.
+- **Structure**: The source code is located in `src/babel/`. Note that the package name for imports is `babel`.
 
 ### Testing Information
 
-- **Execution**: Run all tests from the `babel/` directory using `pytest`:
+- **Execution**: Run all tests from the repository root using `pytest`:
   ```bash
   python -m pytest
   ```
 - **Adding New Tests**:
-  - Place new test files in the `babel/tests/` directory.
+  - Place new test files in the `tests/` directory.
   - Test files should be named `test_*.py`.
-  - Use `pytest` fixtures for common setup (see `babel/tests/conftest.py`).
+  - Use `pytest` fixtures for common setup (see `tests/conftest.py`).
 - **Demo Test**:
   Here is a simple test case demonstrating how to test the math library:
   ```python
@@ -43,4 +42,4 @@
   - Follow PEP 8 with a line length limit of 100 characters.
   - Use `ruff` for linting (`E`, `F`, `I` rules).
   - Target Python 3.11 features.
-- **Generator Modes**: To add a new generator mode, create a new class inheriting from `LibraryGenerator` in `babel/src/babel/generators/` and register it in `babel/src/babel/cli.py`.
+- **Generator Modes**: To add a new generator mode, create a new class inheriting from `LibraryGenerator` in `src/babel/generators/` and register it in `src/babel/cli.py`.

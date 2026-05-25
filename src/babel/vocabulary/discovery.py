@@ -79,10 +79,10 @@ def _setup_hint() -> str:
     return (
         "No vocabulary file found.\n\n"
         "Pass one explicitly:\n"
-        "  babel-poc page --vocab /path/to/words.txt\n\n"
+        "  library-of-babel page --vocab /path/to/words.txt\n\n"
         "Or install default vocabularies:\n"
-        "  babel-poc setup-vocab --source wordfreq_25k\n"
-        "  babel-poc setup-vocab --all"
+        "  library-of-babel setup-vocab --source wordfreq_25k\n"
+        "  library-of-babel setup-vocab --all"
     )
 
 
