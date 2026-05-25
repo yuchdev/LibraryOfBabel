@@ -28,7 +28,7 @@
 ### Lint / format / typing
 
 - `uv run ruff check .` ❌
-  - Fails due to pre-existing lint issues (import ordering, unused imports, long line, `Optionsl` typo in tests).
+  - Fails due to pre-existing lint issues (import ordering, unused imports, long line, and a test typo: `Optionsl` instead of `Optional`).
 - `uv run ruff format --check .` ❌
   - Reports pre-existing formatting drift in multiple files.
 - `uv run mypy src` ❌
