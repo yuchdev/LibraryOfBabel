@@ -2,18 +2,18 @@
 
 ## Abstract
 
-This article investigates a sequence of mathematical transformations of The Library of Babel originally proposed by Jorge Luis Borges. Starting from the classical combinatoric construction containing every possible sequence of characters, we progressively constrain the Library so that:
+This article investigates a sequence relating to mathematical transformations of The Library of Babel originally proposed by Jorge Luis Borges. Starting from the classical combinatoric construction containing every possible sequence of characters, we progressively constrain the Library so that:
 
-1. the number of possible books decreases,
-2. the average semantic density increases,
-3. random pages become increasingly human-readable.
+1. the number of possible books decreases
+2. the average semantic density increases
+3. random pages become increasingly human-readable
 
 At each stage we introduce:
 
-* a mathematical model,
-* combinatoric analysis,
-* asymptotic reduction,
-* Python algorithms that are capable of generating pages on demand from compact seeds.
+* a mathematical model
+* combinatoric analysis
+* asymptotic reduction
+* Python algorithms that are capable of generating pages on demand from compact seeds
 
 The experiment reveals a transition from pure entropy toward structured language and eventually toward semantic manifolds approximating meaningful literature.
 
@@ -23,10 +23,10 @@ The experiment reveals a transition from pure entropy toward structured language
 
 Borges defines books with:
 
-* 410 pages,
-* 40 lines/page,
-* 80 characters/line,
-* alphabet of 25 symbols.
+* 410 pages
+* 40 lines/page
+* 80 characters/line
+* alphabet of 25 symbols
 
 Total character positions:
 
