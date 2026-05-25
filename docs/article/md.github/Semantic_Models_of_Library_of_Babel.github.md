@@ -10,6 +10,7 @@ The fenced form is supported by GitHub and avoids problems with some previewers 
 
 - [Introduction: The Thermodynamics of Infinite Text](#introduction-the-thermodynamics-of-infinite-text)
 - [The Original Borges Combinatoric Baseline Model](#the-original-borges-combinatoric-baseline-model)
+- [Stage 0: The English-Language Borges Baseline](#stage-0-the-english-language-borges-baseline)
 - [Stage 1: The Lexical Reduction Model](#stage-1-the-lexical-reduction-model)
   - [Mathematical Formulation of Lexical Entropy](#mathematical-formulation-of-lexical-entropy)
   - [Algorithmic Implementation of Lexical Constraints](#algorithmic-implementation-of-lexical-constraints)
@@ -38,7 +39,7 @@ The conceptualization of an infinite repository of text, encompassing every poss
 
 From an information-theoretic perspective, the absolute possession of all possible data is functionally equivalent to the possession of zero data, as the system lacks any inherent mechanism for filtering, structuring, indexing, or parsing meaning.[<sup>5</sup>](https://medium.com/@mycelialmirror/the-library-of-babel-is-on-fire-9d29f2591269) This total lack of context highlights the fundamental asymmetry between syntactic combination and semantic significance, demonstrating that mathematical infinity is entirely distinct from linguistic meaning.[<sup>6</sup>](https://hum11c.omeka.fas.harvard.edu/exhibits/show/readings/the-library-of-babel--a-mathem) To interact with such a theoretical space computationally, one must confront the profound reality that the physical storage of these permutations is a physical impossibility. The original Borges Library configuration contains approximately $1.95 \times 10^{1,834,097}$ distinct books, a number so astronomically large that it vastly exceeds the number of atoms in the observable universe.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) Consequently, modern digital implementations of the Library of Babel must rely on algorithmic generation rather than traditional database retrieval methodologies.[<sup>10</sup>](https://summit.sfu.ca/_flysystem/fedora/2025-01/etd23257.pdf) The text is not stored anywhere; it is dynamically generated on demand via complex reversible mathematical transformations—such as bijective hash functions, multi-precision pseudorandom number generators, or Feistel ciphers—that map a specific numerical coordinate or seed to a specific sequence of characters.[<sup>4</sup>](https://www.reddit.com/r/explainlikeimfive/comments/104v7vu/eli5_how_is_the_library_of_babel_website_isnt/)
 
-Generating purely random permutations across an arbitrary alphabet yields negligible semantic value. To transition the architecture of the Library from a state of pure thermodynamic entropy to one of highly structured Shannon entropy, mathematically rigorous constraints must be progressively applied to the generative algorithms.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) This exhaustive research report outlines a sequence of progressively restrictive mathematical models designed to drastically compress the combinatoric volume of the Library while proportionately amplifying the semantic meaningfulness of the randomly generated text. It mathematically formalizes the baseline model, introduces progressive lexical, syntactic, and semantic reductions, and details the Python implementations required to actualize these constraints. Furthermore, addressing the specific requirements of advanced computational text generation, this report proposes the integration of state-of-the-art Large Language Models (LLMs) and arithmetic coding to navigate the ultimate frontier of this problem: generating infinite, coherent, contextually grounded literature deterministically. Finally, a robust algorithmic framework is detailed to demonstrate the $O(1)$ memoryless generation of constrained pages, providing a functional architecture for infinitely scalable semantic exploration.
+Generating purely random permutations across an arbitrary alphabet yields negligible semantic value. To transition the architecture of the Library from a state of pure thermodynamic entropy to one of highly structured Shannon entropy, mathematically rigorous constraints must be progressively applied to the generative algorithms.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) This exhaustive research report outlines a sequence of progressively restrictive mathematical models designed to drastically compress the combinatoric volume of the Library while proportionately amplifying the semantic meaningfulness of the randomly generated text. It mathematically formalizes the historical baseline model, normalizes it into an English-language Stage 0 baseline, introduces progressive lexical, syntactic, and semantic reductions, and details the Python implementations required to actualize these constraints. Furthermore, addressing the specific requirements of advanced computational text generation, this report proposes the integration of state-of-the-art Large Language Models (LLMs) and arithmetic coding to navigate the ultimate frontier of this problem: generating infinite, coherent, contextually grounded literature deterministically. Finally, a robust algorithmic framework is detailed to demonstrate the $O(1)$ memoryless generation of constrained pages, providing a functional architecture for infinitely scalable semantic exploration.
 
 ## The Original Borges Combinatoric Baseline Model
 
@@ -67,6 +68,36 @@ Thus, the Library contains approximately $1.95 \times 10^{1,834,097}$ discrete b
 
 In this unmodified baseline model, the statistical probability of selecting a sequence of characters that form even a single coherent English sentence is vanishingly small. The structural randomness is entirely unbounded, maximizing the entropy of the system. To generate pages on the fly without storing them, a straightforward mapping between a 3,200-character page space (40 lines multiplied by 80 characters) and a unique numerical seed derived from the book's location is utilized.[<sup>11</sup>](https://www.quora.com/How-many-bytes-of-storage-would-the-Library-of-Babel-take-if-it-was-stored-in-a-digital-format) However, because the text lacks any organizational hierarchy or semantic clustering, this model serves primarily as a demonstration of mathematical infinity rather than a repository of accessible knowledge.
 
+## Stage 0: The English-Language Borges Baseline
+
+The original Borges model is the historical combinatoric baseline, but it is not a fair numerical baseline for the later English-oriented reductions. Borges' alphabet has 25 symbols, usually described as 22 letters plus comma, period, and space; the later lexical, grammatical, and semantic stages operate over English vocabulary and English orthography. Therefore, before applying any semantic constraint, the model must be normalized into an English-language character model while preserving Borges' physical book geometry.
+
+Let the normalized English alphabet be:
+
+```math
+A_{\mathrm{en}} = 26\ \text{lowercase English letters} + \{\text{comma},\ \text{period},\ \text{space}\}, \qquad |A_{\mathrm{en}}| = 29.
+```
+
+The book still contains the same number of independent character slots:
+
+```math
+C = 410 \times 40 \times 80 = 1,312,000.
+```
+
+However, each slot now ranges over 29 English orthographic symbols rather than 25 Borges symbols. The normalized Stage 0 state space is therefore:
+
+```math
+\text{Total English Baseline Books}=29^{1,312,000}.
+```
+
+In base-10 scale:
+
+```math
+\log_{10}(29^{1,312,000}) = 1,312,000 \times \log_{10}(29) \approx 1,918,666.
+```
+
+Thus, Stage 0 contains approximately $10^{1,918,666}$ possible books. This normalization actually expands the original Borges space by a factor of $(29/25)^{1,312,000}$, but it removes a category error from the rest of the article: every later reduction is now measured against an English-language unconstrained model, not against a Spanish-like or language-ambiguous symbolic alphabet. Stage 1 and all subsequent stages can therefore be interpreted as reductions of English textual entropy rather than as simultaneous changes of both language and model class.
+
 ## Stage 1: The Lexical Reduction Model
 
 The foundational step in introducing discernible meaning to a random generation model is to decisively abandon character-level permutation in favor of token-level permutation.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) By forcing the generative algorithm to select entire, pre-defined words from a static vocabulary pool rather than assembling isolated alphanumeric characters blindly, the generated text is mathematically guaranteed to consist entirely of valid lexical units. This immediate constraint effectively eliminates the overwhelming majority of unpronounceable gibberish that plagues the original Borges model, transitioning the library from a state of total alphanumeric chaos to a recognizable, albeit disjointed, vocabulary space.
@@ -94,7 +125,7 @@ To find the base-10 representation of this restricted library space:
 ```
 [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
-This calculation reveals a total volume of approximately $10^{1,093,340}$ unique books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) While this integer remains incomprehensibly massive, it represents a staggering reduction of the library's size by over 740,000 orders of magnitude compared to the baseline model. Although the generated pages will read as nonsensical "word salad," every individual unit is linguistically recognizable.
+This calculation reveals a total volume of approximately $10^{1,093,340}$ unique books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) While this integer remains incomprehensibly massive, it represents a staggering reduction of the library's size by over 825,000 orders of magnitude compared to the normalized Stage 0 English-language baseline. Although the generated pages will read as nonsensical "word salad," every individual unit is linguistically recognizable.
 
 ### Algorithmic Implementation of Lexical Constraints
 
@@ -354,7 +385,7 @@ The number of valid texts of length $N$ that can be generated is dictated by the
 
 | **Progressive Model Stage** | **Combinatorial Constraint Mechanism** | **Asymptotic Entropy / Volume Bounds**                                                                 | **Resulting Output Quality**             |
 |-----------------------------|----------------------------------------|--------------------------------------------------------------------------------------------------------|------------------------------------------|
-| **0. Original Borges**      | Absolute Character Permutation         | $25^{1,312,000}$  | Perfect Uniform Noise [<sup>2</sup>](https://en.wikipedia.org/wiki/The_Library_of_Babel)       |
+| **0. English-Language Borges** | English character permutation          | $29^{1,312,000}$  | Perfect uniform English-symbol noise [<sup>2</sup>](https://en.wikipedia.org/wiki/The_Library_of_Babel) |
 | **1. Lexical Reduction**    | Pre-defined Vocabulary Arrays          | $(W+P)^N$  | Nonsense Word Salad [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)         |
 | **2. Syntactic Reduction**  | Adjacency Bounds (Punctuation)         | $\sum_{k=0}^{\lfloor (N+1)/2 \rfloor}\binom{N-k+1}{k}P^kW^{N-k}$ | Paced Word Salad [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)            |
 | **3. Sentence Structure**   | Uniform Token Length Limits            | $W^{15S}P^S$ | Fragmented Clauses [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)          |
@@ -545,7 +576,7 @@ By mapping the discrete space of text to a continuous latent distribution using 
 
 The progressive computational reduction of Borges' Library of Babel mathematically represents the profound information-theoretic journey from maximum thermodynamic entropy to deeply compressed semantic meaning.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
-In its unconstrained, baseline theoretical state, the library contains an incomprehensible $25^{1,312,000}$ possible states.[<sup>1</sup>](https://en.wikipedia.org/wiki/The_Unimaginable_Mathematics_of_Borges%27_Library_of_Babel) Because every sequential configuration of characters is deemed equally likely by the system, the mutual information $I(\text{text};\text{meaning})$ is effectively zero. Attempting to locate a semantically valid page within this unbounded combinatoric space is functionally identical to the Infinite Monkey Theorem—a scenario heavily governed by probabilistic limits requiring spans of computational time orders of magnitude longer than the age of the universe.[<sup>3</sup>](https://hum11c.omeka.fas.harvard.edu/exhibits/show/open-readings/the-library-of-babel-and-infin)
+In its unconstrained, normalized Stage 0 theoretical state, the English-language library contains an incomprehensible $29^{1,312,000}$ possible states, preserving Borges' book geometry while aligning the alphabet with English orthography. Because every sequential configuration of characters is deemed equally likely by the system, the mutual information $I(\text{text};\text{meaning})$ is effectively zero. Attempting to locate a semantically valid page within this unbounded combinatoric space is functionally identical to the Infinite Monkey Theorem—a scenario heavily governed by probabilistic limits requiring spans of computational time orders of magnitude longer than the age of the universe.[<sup>3</sup>](https://hum11c.omeka.fas.harvard.edu/exhibits/show/open-readings/the-library-of-babel-and-infin)
 
 However, as each consecutive mathematical model is dynamically overlaid—progressing from Lexical vocabulary boundaries and Syntactic spacing rules to Context-Free Grammatical matrices and ultimately Markovian Semantic Graphs—the exponent denoting the size of the state space shrinks exponentially.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) By mapping fixed token blocks instead of isolated characters, generating constraints via transition matrix eigenvalues, and eventually tethering the probabilistic outputs to the immense contextual weights of Large Language Models via deterministic Arithmetic Coding, the Library successfully transitions from a physical universe of static noise into a synthesized engine of human thought.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
