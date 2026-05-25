@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from babel.constants import DEFAULT_PUNCTUATION
+from babel.generators.constants import SHARED_PUNCTUATION
+from babel.generators.metadata import ModelMetadata
 from babel.rendering.page_renderer import render_tokens
 
 
@@ -12,7 +14,7 @@ class BookConfig(BaseModel):
     pages: int = 410
     tokens_per_page: int = 320
     vocabulary_id: str = "unknown"
-    punctuation: list[str] = DEFAULT_PUNCTUATION
+    punctuation: list[str] = Field(default_factory=lambda: list(DEFAULT_PUNCTUATION))
 
 
 class GeneratedPage(BaseModel):
@@ -24,11 +26,20 @@ class GeneratedPage(BaseModel):
 
 class LibraryGenerator(ABC):
     mode_id: str
-    display_name: str
+    metadata: ModelMetadata
 
     def __init__(self, words: list[str], punctuation: list[str]) -> None:
         self.words = words
-        self.punctuation = punctuation
+        if punctuation and punctuation != SHARED_PUNCTUATION:
+            raise ValueError(
+                f"{self.mode_id} requires shared punctuation "
+                f"{SHARED_PUNCTUATION}, got {punctuation}"
+            )
+        self.punctuation = list(SHARED_PUNCTUATION)
+
+    @property
+    def display_name(self) -> str:
+        return self.metadata.display_name
 
     @abstractmethod
     def log10_size(self, pages: int = 410, tokens_per_page: int = 320) -> float:

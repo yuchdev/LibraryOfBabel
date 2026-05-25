@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import typer
-import sys
-from typer.main import get_command
 from rich.console import Console
 from rich.table import Table
 
@@ -15,23 +13,26 @@ from babel.constants import (
     BORGES_LOG10_SIZE,
     BORGES_PAGES,
     DEFAULT_PUNCTUATION,
+    HISTORICAL_BORGES_LOG10_SIZE,
     OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10,
     UNIVERSE_ATOMS_LOG10,
 )
 from babel.generators.base import BookConfig, LibraryGenerator
 from babel.generators.borges_library import BorgesLibraryGenerator
-from babel.generators.word_based import WordBasedGenerator
-from babel.generators.punctuation_constrained import PunctuationConstrainedGenerator
-from babel.generators.sentence_structured import SentenceStructuredGenerator
+from babel.generators.constants import CHARS_PER_PAGE, SHARED_PUNCTUATION
 from babel.generators.grammar_constrained import GrammarConstrainedGenerator
+from babel.generators.metadata import ModelMetadata
+from babel.generators.punctuation_constrained import PunctuationConstrainedGenerator
 from babel.generators.semantic_constrained import SemanticConstrainedGenerator
+from babel.generators.sentence_structured import SentenceStructuredGenerator
 from babel.generators.topic_coherent import TopicCoherentGenerator
+from babel.generators.word_based import WordBasedGenerator
 from babel.mathlib.logmath import scientific_from_log10
 from babel.mathlib.metrics import calculate_metrics
 from babel.rendering.page_renderer import wrap_text
 from babel.vocabulary.discovery import VocabularyNotFoundError, resolve_vocabulary_path
 from babel.vocabulary.installer import install_all_sources, install_source
-from babel.vocabulary.loader import load_words
+from babel.vocabulary.loader import load_pos_vocab, load_words
 from babel.vocabulary.models import VocabularyInfo
 from babel.vocabulary.normalizer import normalize_words
 
@@ -47,7 +48,7 @@ def _load_vocab(vocab_path: Path) -> tuple[list[str], list[str]]:
     """Load and normalize vocabulary, return (words, punctuation)."""
     raw = load_words(vocab_path)
     words = normalize_words(raw, lowercase=True, reject_spaces=True)
-    return words, DEFAULT_PUNCTUATION
+    return words, SHARED_PUNCTUATION
 
 
 def _resolve_vocab(
@@ -67,13 +68,19 @@ def _resolve_vocab(
         raise typer.Exit(1) from exc
 
 
-def _make_generators(words: list[str], punctuation: list[str]) -> list[LibraryGenerator]:
+def _load_pos_vocab_for_grammar(vocab_words_path: Path) -> dict[str, list[str]]:
+    return load_pos_vocab(vocab_words_path.parent)
+
+
+def _make_generators(
+    words: list[str], punctuation: list[str], pos_vocab: Optional[dict[str, list[str]]] = None
+) -> list[LibraryGenerator]:
     return [
         BorgesLibraryGenerator(words, punctuation),
         WordBasedGenerator(words, punctuation),
         PunctuationConstrainedGenerator(words, punctuation),
         SentenceStructuredGenerator(words, punctuation),
-        GrammarConstrainedGenerator(words, punctuation),
+        GrammarConstrainedGenerator(words, punctuation, pos_vocab=pos_vocab),
         SemanticConstrainedGenerator(words, punctuation),
         TopicCoherentGenerator(words, punctuation),
     ]
@@ -96,32 +103,48 @@ def _patch_typer_help() -> None:
     """Patch Typer to show all subcommand options in the main help message."""
     original_get_command = typer.main.get_command
 
-    def patched_get_command(typer_app: typer.Typer) -> any:
+    def patched_get_command(typer_app: typer.Typer) -> Any:
         click_command = original_get_command(typer_app)
         original_format_help = click_command.format_help
 
-        def patched_format_help(ctx: any, formatter: any) -> None:
+        def patched_format_help(ctx: Any, formatter: Any) -> None:
             original_format_help(ctx, formatter)
-            for name, command in click_command.commands.items():
+            for name, command in getattr(click_command, "commands", {}).items():
                 console.print(f"\n[bold]{'='*20} {name} {'='*20}[/bold]")
                 with typer.Context(command, info_name=name, parent=ctx) as sub_ctx:
                     console.print(sub_ctx.get_help())
 
-        click_command.format_help = patched_format_help
+        click_command.format_help = patched_format_help  # type: ignore[method-assign]
         return click_command
 
-    typer.main.get_command = patched_get_command
+    typer.main.get_command = patched_get_command  # type: ignore[assignment]
 
 
 _patch_typer_help()
 
 
+def _print_model_metadata(metadata: ModelMetadata) -> None:
+    stage = "Historical" if metadata.stage_number is None else f"Stage {metadata.stage_number}"
+    console.print(f"  stage             : {stage}")
+    console.print(f"  canonical name    : {metadata.article_model_name}")
+    console.print(f"  formula           : {metadata.formula}")
+    console.print(f"  implementation    : {metadata.implementation_level}")
+    console.print(
+        "  required data     : "
+        + (", ".join(metadata.required_data) if metadata.required_data else "none")
+    )
+
+
 @app.command("info")
 def cmd_info() -> None:
-    """Print Borges base size, universe constants, and available modes."""
+    """Print article-aligned model chain summary and constants."""
     console.rule("[bold]Library of Babel Info[/bold]")
     m, e = scientific_from_log10(BORGES_LOG10_SIZE)
-    console.print("\n[bold]Borges Original Library[/bold]")
+    hm, he = scientific_from_log10(HISTORICAL_BORGES_LOG10_SIZE)
+    console.print("\n[bold]Historical Reference[/bold]")
+    console.print(f"  Borges 25-symbol log10 size: {HISTORICAL_BORGES_LOG10_SIZE:,.5f}")
+    console.print(f"  Size                      : ~{hm:.3f} × 10^{he:,}")
+    console.print("\n[bold]Stage 0 Baseline[/bold]")
     console.print(f"  Pages per book    : {BORGES_PAGES}")
     console.print(f"  Alphabet size     : {BORGES_ALPHABET_SIZE}")
     console.print(f"  Character slots   : {BORGES_CHAR_SLOTS:,}")
@@ -136,17 +159,10 @@ def cmd_info() -> None:
     )
 
     console.print("\n[bold]Available Modes[/bold]")
-    modes = [
-        ("borges-library", "Character-based original model (English alphabet)."),
-        ("word-based", "Each token can be any word or punctuation independently."),
-        ("punctuation-constrained", "No two punctuation tokens appear consecutively."),
-        ("sentence-structured", "Fixed-length sentences (15 words + end punct)."),
-        ("grammar-constrained", "Tokens follow a fixed cyclic grammar template."),
-        ("semantic-constrained", "Tokens are connected via mock semantic clusters (hash-based, stub)."),
-        ("topic-coherent", "Each book is restricted to a deterministic vocabulary subset (stub)."),
-    ]
-    for mode_id, desc in modes:
-        console.print(f"  [cyan]{mode_id}[/cyan]  — {desc}")
+    generators = _make_generators(["demo"], SHARED_PUNCTUATION)
+    for gen in generators:
+        console.print(f"\n  [cyan]{gen.mode_id}[/cyan] — {gen.display_name}")
+        _print_model_metadata(gen.metadata)
 
 
 @app.command("vocab-info")
@@ -188,33 +204,36 @@ def cmd_metrics(
 ) -> None:
     """Calculate and display Library size metrics."""
     resolved = _resolve_vocab(vocab, vocab_source, auto_download)
-    generators = _generators_by_id(*_load_vocab(resolved))
+    words, punctuation = _load_vocab(resolved)
+    pos_vocab = _load_pos_vocab_for_grammar(resolved)
+    generators = _generators_by_id(words, punctuation, pos_vocab)
     if mode not in generators:
         console.print(f"[red]Unknown mode: {mode}. Choose from: {list(generators)}[/red]")
         raise typer.Exit(1)
     gen = generators[mode]
 
-    # Default tokens_per_page: 3200 for Borges, 320 for others
+    # tokens_per_page is preview-only, metrics are theoretical by model stage.
     if tokens_per_page is None:
-        tokens_per_page = 3200 if mode == "borges-library" else 320
+        tokens_per_page = CHARS_PER_PAGE if mode == "borges-library" else 320
 
     log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
     metrics = calculate_metrics(mode, log10_sz)
 
     console.rule(f"[bold]Metrics — {gen.display_name}[/bold]")
     console.print(f"  Mode              : {metrics.mode_id}")
+    _print_model_metadata(gen.metadata)
     console.print(f"  log10(size)       : {metrics.log10_size:,.5f}")
     console.print(f"  Size              : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
     if abs(metrics.log10_smaller_than_borges) < 0.1:
-        console.print("  vs Borges         : [green]equal[/green]")
+        console.print("  vs Stage 0        : [green]equal[/green]")
     elif metrics.log10_smaller_than_borges > 0:
         console.print(
-            "  vs Borges         : "
+            "  vs Stage 0        : "
             f"10^{metrics.log10_smaller_than_borges:,.0f} times [red]smaller[/red]"
         )
     else:
         console.print(
-            "  vs Borges         : "
+            "  vs Stage 0        : "
             f"10^{-metrics.log10_smaller_than_borges:,.0f} times [green]larger[/green]"
         )
     if metrics.log10_larger_than_universe_atoms > 0:
@@ -255,15 +274,17 @@ def cmd_page(
 ) -> None:
     """Generate and display one page from a deterministic book."""
     resolved = _resolve_vocab(vocab, vocab_source, auto_download)
-    generators = _generators_by_id(*_load_vocab(resolved))
+    words, punctuation = _load_vocab(resolved)
+    pos_vocab = _load_pos_vocab_for_grammar(resolved)
+    generators = _generators_by_id(words, punctuation, pos_vocab)
     if mode not in generators:
         console.print(f"[red]Unknown mode: {mode}[/red]")
         raise typer.Exit(1)
     gen = generators[mode]
 
-    # Default tokens_per_page: 3200 for Borges, 320 for others
+    # tokens_per_page controls preview rendering only.
     if tokens_per_page is None:
-        tokens_per_page = 3200 if mode == "borges-library" else 320
+        tokens_per_page = CHARS_PER_PAGE if mode == "borges-library" else 320
 
     config = BookConfig(
         mode_id=mode,
@@ -271,7 +292,7 @@ def cmd_page(
         pages=pages,
         tokens_per_page=tokens_per_page,
         vocabulary_id=resolved.stem,
-        punctuation=list(DEFAULT_PUNCTUATION),
+        punctuation=list(SHARED_PUNCTUATION),
     )
     log10_sz = gen.log10_size(pages=pages, tokens_per_page=tokens_per_page)
     metrics = calculate_metrics(mode, log10_sz)
@@ -279,6 +300,7 @@ def cmd_page(
 
     console.rule(f"[bold]Library of Babel — Page {page}[/bold]")
     console.print(f"\n[bold]Mode:[/bold]  {gen.display_name}")
+    _print_model_metadata(gen.metadata)
     console.print("\n[bold]Book:[/bold]")
     console.print(f"  seed           : {seed}")
     console.print(f"  page           : {page} / {pages}")
@@ -286,10 +308,10 @@ def cmd_page(
     console.print("\n[bold]Metrics:[/bold]")
     console.print(f"  Library size   : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
     if abs(metrics.log10_smaller_than_borges) < 0.1:
-        console.print("  Size vs Borges : [green]equal[/green]")
+        console.print("  Size vs Stage 0 : [green]equal[/green]")
     elif metrics.log10_smaller_than_borges > 0:
         console.print(
-            "  Smaller than Borges : "
+            "  Smaller than Stage 0 : "
             f"10^{metrics.log10_smaller_than_borges:,.0f}"
         )
     console.print("\n[bold]Page:[/bold]")
@@ -311,34 +333,41 @@ def cmd_compare(
     """Compare all modes in a table."""
     resolved = _resolve_vocab(vocab, vocab_source, auto_download)
     words, punctuation = _load_vocab(resolved)
-    generators = _make_generators(words, punctuation)
+    pos_vocab = _load_pos_vocab_for_grammar(resolved)
+    generators = _make_generators(words, punctuation, pos_vocab)
 
     table = Table(title="Library of Babel — Mode Comparison", show_lines=True)
     table.add_column("Mode", style="cyan")
+    table.add_column("Stage", justify="right")
+    table.add_column("Formula")
+    table.add_column("Impl")
     table.add_column("log10(size)", justify="right")
     table.add_column("Size (scientific)", justify="right")
-    table.add_column("vs Borges", justify="right")
+    table.add_column("vs Stage 0", justify="right")
     table.add_column("vs Universe atoms", justify="right")
     table.add_column("vs Planck volumes", justify="right")
 
-    bm, be = scientific_from_log10(BORGES_LOG10_SIZE)
+    bm, be = scientific_from_log10(HISTORICAL_BORGES_LOG10_SIZE)
     table.add_row(
         "Borges (1941 Edition)",
-        f"{BORGES_LOG10_SIZE:,.0f}",
+        "Historical",
+        "25^1,312,000",
+        "theoretical",
+        f"{HISTORICAL_BORGES_LOG10_SIZE:,.0f}",
         f"~{bm:.2f} × 10^{be:,}",
         "baseline",
-        f"10^{BORGES_LOG10_SIZE - UNIVERSE_ATOMS_LOG10:,.0f} larger",
-        f"10^{BORGES_LOG10_SIZE - OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10:,.0f} larger",
+        f"10^{HISTORICAL_BORGES_LOG10_SIZE - UNIVERSE_ATOMS_LOG10:,.0f} larger",
+        f"10^{HISTORICAL_BORGES_LOG10_SIZE - OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10:,.0f} larger",
     )
 
     from babel.progress.progress import progress_context
 
     with progress_context("Calculating metrics", len(generators)) as prog:
         for gen in generators:
-            # Default tokens_per_page: 3200 for Borges, 320 for others
+            # tokens_per_page is preview-only for page rendering.
             current_tpp = tokens_per_page
             if current_tpp == 320 and gen.mode_id == "borges-library":
-                current_tpp = 3200
+                current_tpp = CHARS_PER_PAGE
 
             log10_sz = gen.log10_size(pages=pages, tokens_per_page=current_tpp)
             metrics = calculate_metrics(gen.mode_id, log10_sz)
@@ -363,6 +392,9 @@ def cmd_compare(
             )
             table.add_row(
                 gen.display_name,
+                f"{gen.metadata.stage_number}",
+                gen.metadata.formula,
+                gen.metadata.implementation_level,
                 f"{metrics.log10_size:,.0f}",
                 f"~{metrics.mantissa:.2f} × 10^{metrics.exponent:,}",
                 vs_borges,
@@ -452,8 +484,15 @@ def cmd_setup_vocab(
         )
 
 
-def _generators_by_id(words: list[str], punctuation: list[str]) -> dict[str, LibraryGenerator]:
-    return {generator.mode_id: generator for generator in _make_generators(words, punctuation)}
+def _generators_by_id(
+    words: list[str],
+    punctuation: list[str],
+    pos_vocab: Optional[dict[str, list[str]]] = None,
+) -> dict[str, LibraryGenerator]:
+    return {
+        generator.mode_id: generator
+        for generator in _make_generators(words, punctuation, pos_vocab)
+    }
 
 
 if __name__ == "__main__":

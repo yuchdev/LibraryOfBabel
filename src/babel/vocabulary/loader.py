@@ -28,3 +28,27 @@ def load_words(path: Path) -> list[str]:
                 words.append(token)
             progress.advance(1)
     return sorted(words)
+
+
+def load_pos_vocab(base_dir: Path) -> dict[str, list[str]]:
+    """
+    Load optional POS vocab files from a vocabulary directory.
+
+    Expected files:
+    - nouns.txt
+    - verbs.txt
+    - adjectives.txt
+    - adverbs.txt
+    """
+    mapping = {
+        "NOUN": "nouns.txt",
+        "VERB": "verbs.txt",
+        "ADJ": "adjectives.txt",
+        "ADV": "adverbs.txt",
+    }
+    pos_vocab: dict[str, list[str]] = {}
+    for tag, filename in mapping.items():
+        file_path = base_dir / filename
+        if file_path.exists() and file_path.stat().st_size > 0:
+            pos_vocab[tag] = load_words(file_path)
+    return pos_vocab

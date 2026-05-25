@@ -50,4 +50,4 @@ def demo_words() -> list[str]:
 
 @pytest.fixture
 def demo_punctuation() -> list[str]:
-    return [".", ",", ";", ":", "?", "!"]
+    return [".", "?", ",", "!"]

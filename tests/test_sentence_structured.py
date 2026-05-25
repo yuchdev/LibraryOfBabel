@@ -1,6 +1,7 @@
 import math
 
 from babel.generators.base import BookConfig
+from babel.generators.constants import SENTENCE_BLOCKS_PER_BOOK, SHARED_PUNCTUATION
 from babel.generators.sentence_structured import WORDS_PER_SENTENCE, SentenceStructuredGenerator
 
 
@@ -30,5 +31,8 @@ def test_fixed_sentence_structure(demo_words, demo_punctuation):
 def test_fixed_sentence_log10_size(demo_words, demo_punctuation):
     gen = SentenceStructuredGenerator(demo_words, demo_punctuation)
     log10_sz = gen.log10_size(pages=1, tokens_per_page=16)
-    expected = 15 * math.log10(len(demo_words)) + math.log10(3)
+    expected = (
+        SENTENCE_BLOCKS_PER_BOOK * 15 * math.log10(len(demo_words))
+        + SENTENCE_BLOCKS_PER_BOOK * math.log10(len(SHARED_PUNCTUATION))
+    )
     assert abs(log10_sz - expected) < 0.01

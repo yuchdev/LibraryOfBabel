@@ -1,22 +1,37 @@
 import math
+
 from babel.generators.base import BookConfig, GeneratedPage, LibraryGenerator
+from babel.generators.constants import (
+    CHARS_PER_BOOK,
+    ENGLISH_CHARACTER_ALPHABET,
+    ENGLISH_CHARACTER_ALPHABET_SIZE,
+)
+from babel.generators.metadata import ModelMetadata
 from babel.utils.hashing import deterministic_index
 
+
 class BorgesLibraryGenerator(LibraryGenerator):
+    """Stage 0 normalized English character baseline with Borges geometry."""
+
     mode_id = "borges-library"
-    display_name = "Original Borges Library"
+    metadata = ModelMetadata(
+        mode_id=mode_id,
+        stage_number=0,
+        display_name="Stage 0: English-Language Borges Baseline",
+        article_model_name="English-Language Borges Baseline",
+        formula="31^1,312,000",
+        implementation_level="canonical",
+        required_data=[],
+        theoretical_basis="Character-level normalized English baseline for all later stages.",
+    )
 
     def __init__(self, words: list[str], punctuation: list[str]) -> None:
         super().__init__(words, punctuation)
-        # Borges model is character-based.
-        # Adjusted to English: 26 letters + space + punctuations
-        self.alphabet = list("abcdefghijklmnopqrstuvwxyz ") + punctuation
+        self.alphabet = list(ENGLISH_CHARACTER_ALPHABET)
 
     def log10_size(self, pages: int = 410, tokens_per_page: int = 3200) -> float:
-        """S^N where S is alphabet size and N is total characters."""
-        # Note: tokens_per_page for Borges means characters_per_page
-        n = pages * tokens_per_page
-        return n * math.log10(len(self.alphabet))
+        """31^1,312,000."""
+        return CHARS_PER_BOOK * math.log10(ENGLISH_CHARACTER_ALPHABET_SIZE)
 
     def generate_token(self, seed: str, position: int) -> str:
         idx = deterministic_index(seed, self.mode_id, position, len(self.alphabet))

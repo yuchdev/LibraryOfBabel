@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 
 class VocabularySource(BaseModel):
+    """Vocabulary source registry entry used by setup-vocab and stage-aware docs."""
+
     source_id: str
     display_name: str
     homepage_url: str
@@ -13,6 +15,7 @@ class VocabularySource(BaseModel):
     local_subdir: str
     expected_files: list[str]
     notes: str
+    suitable_stages: list[str] = []
 
 
 KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
@@ -29,6 +32,7 @@ KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
             "Download requires building from source or using a pre-built export. "
             "See homepage for details."
         ),
+        suitable_stages=["stage-1", "stage-2", "stage-3"],
     ),
     "wordnet": VocabularySource(
         source_id="wordnet",
@@ -44,6 +48,7 @@ KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
             "POS-aware semantic English wordnet. "
             "Best for POS-aware and semantic generation modes."
         ),
+        suitable_stages=["stage-4", "stage-5"],
     ),
     "wordfreq_25k": VocabularySource(
         source_id="wordfreq_25k",
@@ -59,6 +64,7 @@ KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
             "25 000 English words with frequency data exported from wordfreq. "
             "Best for frequency-weighted vocabulary."
         ),
+        suitable_stages=["stage-1", "stage-2", "stage-3", "stage-6-demo"],
     ),
     "subtlex_us": VocabularySource(
         source_id="subtlex_us",
@@ -72,5 +78,6 @@ KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
             "American English word frequencies from film subtitles. "
             "Best for common spoken-like English vocabulary."
         ),
+        suitable_stages=["stage-1", "stage-2", "stage-3"],
     ),
 }

@@ -1,0 +1,23 @@
+from babel.generators.constants import (
+    CHARS_PER_BOOK,
+    CHARS_PER_PAGE,
+    ENGLISH_CHARACTER_ALPHABET,
+    ENGLISH_CHARACTER_ALPHABET_SIZE,
+    SENTENCE_BLOCK_SIZE,
+    SENTENCE_BLOCKS_PER_BOOK,
+    SHARED_PUNCTUATION,
+    TOKEN_SLOTS_PER_BOOK,
+    WORDS_PER_SENTENCE_BLOCK,
+)
+
+
+def test_stage_constants_values():
+    assert CHARS_PER_PAGE == 3_200
+    assert CHARS_PER_BOOK == 1_312_000
+    assert SHARED_PUNCTUATION == [".", "?", ",", "!"]
+    assert ENGLISH_CHARACTER_ALPHABET_SIZE == 31
+    assert ENGLISH_CHARACTER_ALPHABET == list("abcdefghijklmnopqrstuvwxyz ") + SHARED_PUNCTUATION
+    assert TOKEN_SLOTS_PER_BOOK == 218_667
+    assert WORDS_PER_SENTENCE_BLOCK == 15
+    assert SENTENCE_BLOCK_SIZE == 16
+    assert SENTENCE_BLOCKS_PER_BOOK == TOKEN_SLOTS_PER_BOOK // 16

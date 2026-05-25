@@ -16,7 +16,7 @@ def log10_no_adjacent_punct(n: int, w: int, p: int) -> float:
         return float("-inf")
     log10_w = math.log10(w) if w > 0 else float("-inf")
     log10_p = math.log10(p) if p > 0 else float("-inf")
-    max_k = n // 2
+    max_k = (n + 1) // 2
     log10_terms: list[float] = []
     for k in range(0, max_k + 1):
         log10_c = log10_combination(n - k + 1, k)
