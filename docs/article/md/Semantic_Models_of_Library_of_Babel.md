@@ -238,7 +238,9 @@ Given the baseline parameter of $N \approx 218,667$ tokens, the total sentence c
 $$
 \text{Total Sentence Books}=W^{15S}P^S \approx (100,000)^{204,990} \times (6)^{13,666}
 $$
-[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) This mathematical operation yields an order of magnitude of roughly $10^{1,035,639}$ possible books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) The total combinatoric volume of this space is significantly smaller than the previous models, yet every randomly generated text perfectly obeys block-level prose pacing, visually resembling a structured novel despite lacking internal meaning.
+[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) 
+
+This mathematical operation yields an order of magnitude of roughly $10^{1,035,639}$ possible books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) The total combinatoric volume of this space is significantly smaller than the previous models, yet every randomly generated text perfectly obeys block-level prose pacing, visually resembling a structured novel despite lacking internal meaning.
 
 ```python
 WORDS_PER_SENTENCE_LIMIT = 15
@@ -513,7 +515,6 @@ The overarching mathematical objective during this generation is to maximize the
 \$\$\max H(Q) \quad \text{subject to} \quad D\_{KL}(Q |$$
 \max H(Q) \quad \text{subject to} \quad D_{KL}(Q \parallel P) \leq \epsilon
 $$
-
 [<sup>22</sup>](https://aclanthology.org/2026.eacl-long.36.pdf)
 
 Optimizing this ensures that the generated text remains entirely natural (maintaining the minimal KL divergence) while safely carrying the maximum possible entropy (the hidden coordinate seed).[<sup>22</sup>](https://aclanthology.org/2026.eacl-long.36.pdf) Advanced algorithmic frameworks such as Discop, METEOR, and Alkaid focus precisely on preserving this original sampling distribution more faithfully than legacy truncation methods, ensuring the generated text lacks statistical anomalies.[<sup>26</sup>](https://arxiv.org/html/2604.20269v1)
@@ -545,6 +546,7 @@ However, as each consecutive mathematical model is dynamically overlaid—progre
 This cascading mathematical reduction demonstrates a profound realization concerning the architecture of human communication and information theory. Meaning does not exist as an additive property constructed over random noise; rather, it exists strictly as an incredibly tight, rigorously bounded mathematical reduction of a near-infinite combinatoric volume. The true "Library of Meaning" is not a vast desert of random symbols, but rather an extraordinarily compressed, highly interconnected structural manifold concealed deeply within it.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) The application of advanced computational linguistics, continuous probability distributions, and LLM steganography to procedural generation definitively proves that any arbitrary coordinate within a chaotic void can be deterministically pulled toward a manifold of logical coherence. This computationally transforms the existential nightmare of Borges' library from an endless expanse of gibberish into a mathematically indexable, fully explorable map of all possible meaningful literature.[<sup>22</sup>](https://aclanthology.org/2026.eacl-long.36.pdf)
 
 ## Works Cited
+
 1.  The Unimaginable Mathematics of Borges' Library of Babel - Wikipedia, accessed May 25, 2026, [https://en.wikipedia.org/wiki/The_Unimaginable_Mathematics_of_Borges%27_Library_of_Babel](https://en.wikipedia.org/wiki/The_Unimaginable_Mathematics_of_Borges%27_Library_of_Babel)
 
 2.  The Library of Babel - Wikipedia, accessed May 25, 2026, [https://en.wikipedia.org/wiki/The_Library_of_Babel](https://en.wikipedia.org/wiki/The_Library_of_Babel)
@@ -559,7 +561,7 @@ This cascading mathematical reduction demonstrates a profound realization concer
 
 7.  Searching for meaning in the library of Babel: field semantics and problems of digital archiving | Language Documentation and Description, accessed May 25, 2026, [https://www.lddjournal.org/article/pubid/261/](https://www.lddjournal.org/article/pubid/261/)
 
-8.  math-model.md
+8.  [Semantic_Models_of_Library_of_Babel_teaser.md](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
 9.  The Library of Babel (website) - Wikipedia, accessed May 25, 2026, [https://en.wikipedia.org/wiki/The_Library_of_Babel\_(website)](https://en.wikipedia.org/wiki/The_Library_of_Babel_(website))
 
