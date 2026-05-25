@@ -13,6 +13,9 @@ class SemanticConstrainedGenerator(LibraryGenerator):
     """Stage 5 lightweight semantic adjacency graph with deterministic transitions."""
 
     mode_id = "semantic-constrained"
+    NEIGHBOR_OFFSET_A = 7
+    NEIGHBOR_HASH_MULTIPLIER = 31
+    NEIGHBOR_HASH_OFFSET = 17
     metadata = ModelMetadata(
         mode_id=mode_id,
         stage_number=5,
@@ -42,8 +45,10 @@ class SemanticConstrainedGenerator(LibraryGenerator):
         for idx, token in enumerate(self.words):
             neighbors = {
                 self.words[(idx + 1) % w_len],
-                self.words[(idx + 7) % w_len],
-                self.words[(idx * 31 + 17) % w_len],
+                self.words[(idx + self.NEIGHBOR_OFFSET_A) % w_len],
+                self.words[
+                    (idx * self.NEIGHBOR_HASH_MULTIPLIER + self.NEIGHBOR_HASH_OFFSET) % w_len
+                ],
                 SHARED_PUNCTUATION[idx % len(SHARED_PUNCTUATION)],
             }
             adjacency[token] = sorted(neighbors)

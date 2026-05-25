@@ -5,6 +5,7 @@ from babel.mathlib.combinatorics import log10_no_adjacent_punct
 
 
 def _bruteforce_count(n: int, w: int, p: int) -> int:
+    # Exponential by design; keep n small in tests.
     symbols = [f"w{i}" for i in range(w)] + [f"p{i}" for i in range(p)]
     punct = set(symbols[w:])
     count = 0

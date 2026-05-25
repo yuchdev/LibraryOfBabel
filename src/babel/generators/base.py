@@ -31,8 +31,9 @@ class LibraryGenerator(ABC):
     def __init__(self, words: list[str], punctuation: list[str]) -> None:
         self.words = words
         if punctuation and punctuation != SHARED_PUNCTUATION:
+            mode_name = getattr(self, "mode_id", self.__class__.__name__)
             raise ValueError(
-                f"{self.mode_id} requires shared punctuation "
+                f"{mode_name} requires shared punctuation "
                 f"{SHARED_PUNCTUATION}, got {punctuation}"
             )
         self.punctuation = list(SHARED_PUNCTUATION)

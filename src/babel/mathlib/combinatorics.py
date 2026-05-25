@@ -16,6 +16,7 @@ def log10_no_adjacent_punct(n: int, w: int, p: int) -> float:
         return float("-inf")
     log10_w = math.log10(w) if w > 0 else float("-inf")
     log10_p = math.log10(p) if p > 0 else float("-inf")
+    # The article's Stage 2 summation uses floor((N+1)/2) as the upper bound.
     max_k = (n + 1) // 2
     log10_terms: list[float] = []
     for k in range(0, max_k + 1):

@@ -103,8 +103,8 @@ def _patch_typer_help() -> None:
     """Patch Typer to show all subcommand options in the main help message."""
     original_get_command = typer.main.get_command
 
-    def patched_get_command(typer_app: typer.Typer) -> Any:
-        click_command = original_get_command(typer_app)
+    def patched_get_command(app_instance: typer.Typer) -> Any:
+        click_command = original_get_command(app_instance)
         original_format_help = click_command.format_help
 
         def patched_format_help(ctx: Any, formatter: Any) -> None:
