@@ -30,9 +30,9 @@ Borges defines books with:
 
 Total character positions:
 
-[
+$$
 C = 410 \times 40 \times 80
-]
+$$
 
 410\times40\times80=1{,}312{,}000
 
@@ -42,11 +42,11 @@ Total number of books:
 
 Approximation:
 
-[
+$$
 25^{1{,}312{,}000}
 \approx
 1.95 \times 10^{1{,}834{,}097}
-]
+$$
 
 This construction maximizes entropy but minimizes meaning.
 
@@ -65,20 +65,20 @@ Replacing characters with words immediately injects semantic structure.
 Assume:
 
 * vocabulary size:
-  [
+  $$
   W = 100{,}000
-  ]
+  $$
 * punctuation symbols:
-  [
+  $$
   P = 6
-  ]
+  $$
 * average token width ≈ 6 characters.
 
 Approximate token slots:
 
-[
+$$
 N \approx \frac{1{,}312{,}000}{6}
-]
+$$
 
 N\approx\frac{1{,}312{,}000}{6}\approx218{,}667
 
@@ -88,9 +88,9 @@ Total books:
 
 Approximation:
 
-[
+$$
 \approx 10^{1{,}093{,}340}
-]
+$$
 
 The Library shrinks enormously while readability increases dramatically.
 
@@ -141,9 +141,9 @@ which are structurally invalid.
 
 If exactly (k) punctuation marks appear:
 
-[
+$$
 \binom{N-k+1}{k}
-]
+$$
 
 ways exist to place them without adjacency.
 
@@ -187,9 +187,9 @@ W W W W W W W W W W W W W W W P
 
 Sentence count:
 
-[
+$$
 S = \left\lfloor \frac{N}{16} \right\rfloor
-]
+$$
 
 Total Library:
 
@@ -197,9 +197,9 @@ W^{15S}P^S
 
 Approximation:
 
-[
+$$
 \approx 10^{1{,}035{,}639}
-]
+$$
 
 The Library loses vast amounts of entropy while gaining strong textual regularity.
 
@@ -257,9 +257,9 @@ Define vocabulary partitions:
 
 If:
 
-[
+$$
 D,A,N,V
-]
+$$
 
 represent category counts, then one sentence template produces:
 
@@ -269,9 +269,9 @@ possible sentences.
 
 A book with (S) such sentences gives:
 
-[
+$$
 (DANVDNP)^S
-]
+$$
 
 This reduction is enormous.
 
@@ -330,9 +330,9 @@ This transforms the Library from a combinatoric explosion into a constrained sem
 
 Let:
 
-[
+$$
 T_{ij}
-]
+$$
 
 be transition probability from token (i) to token (j).
 
@@ -344,9 +344,9 @@ Approximate sequence count:
 
 where:
 
-[
+$$
 \lambda_{max}
-]
+$$
 
 is the dominant eigenvalue of the transition matrix.
 
@@ -407,21 +407,21 @@ Now the Library approximates actual literature.
 
 The original Borges Library maximizes entropy:
 
-[
+$$
 H_{max}
-]
+$$
 
 Every subsequent constraint reduces entropy:
 
-[
+$$
 H_1 > H_2 > H_3 > H_4
-]
+$$
 
 while increasing mutual information:
 
-[
+$$
 I(text;meaning)
-]
+$$
 
 The experiment demonstrates that human-readable language occupies an infinitesimally thin manifold inside the full combinatoric space of possible books.
 
