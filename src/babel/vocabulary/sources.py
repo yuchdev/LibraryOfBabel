@@ -1,7 +1,7 @@
 """Known vocabulary source registry."""
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class VocabularySource(BaseModel):
@@ -32,7 +32,7 @@ class VocabularySource(BaseModel):
     local_subdir: str
     expected_files: list[str]
     notes: str
-    suitable_stages: list[str] = []
+    suitable_stages: list[str] = Field(default_factory=list)
 
 
 KNOWN_VOCABULARY_SOURCES: dict[str, VocabularySource] = {
