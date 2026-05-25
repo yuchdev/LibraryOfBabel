@@ -2,7 +2,7 @@
 
 This repository currently contains a local-first Python proof of concept for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
 
-## Dependencies and Setup
+## Development Setup
 
 ### Repository Layout
 
@@ -10,35 +10,79 @@ This repository currently contains a local-first Python proof of concept for exp
 - `tests` — automated tests
 - `README.md` — detailed project usage notes and CLI examples
 
-### Dependencies
+## Requirements
 
-The `babel` package targets **Python 3.11+** and is defined in `pyproject.toml`.
+- Python 3.11+
+- `uv`
 
-### Runtime dependencies
+## Install uv
 
-- `typer>=0.12`
-- `rich>=13.0`
-- `pydantic>=2.0`
-- `numpy>=1.26`
-- `scipy>=1.12`
-
-### Development dependencies
-
-- `pytest>=8.0`
-- `ruff>=0.6`
-- `mypy>=1.10`
-
-Install everything, including development tools, with the editable setup below.
-
-### Setup
-
-From the repository root:
+macOS / Linux:
 
 ```bash
-python -m pip install -e ".[dev]"
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-This installs the package in editable mode so local source changes are picked up immediately.
+Homebrew:
+
+```bash
+brew install uv
+```
+
+Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+## Create Environment
+
+```bash
+uv sync --dev
+```
+
+## Run Application
+
+```bash
+uv run python -m babel.cli --help
+```
+
+Or:
+
+```bash
+uv run library-of-babel --help
+```
+
+## Run Tests
+
+```bash
+uv run pytest
+```
+
+## Lint and Type Check
+
+```bash
+uv run ruff check .
+uv run mypy src
+```
+
+## Add Runtime Dependency
+
+```bash
+uv add package-name
+```
+
+## Add Dev Dependency
+
+```bash
+uv add --dev package-name
+```
+
+## Update Lockfile
+
+```bash
+uv lock
+```
 
 ### Bring the App to a Working State (Vocabulary Initialization)
 
@@ -46,36 +90,35 @@ Most commands expect installed vocabulary. After setup, initialize at least one 
 
 ```bash
 # Optional: inspect available sources
-library-of-babel vocab-list-sources
+uv run library-of-babel vocab-list-sources
 
 # Recommended default source
-library-of-babel setup-vocab --source wordfreq_25k
+uv run library-of-babel setup-vocab --source wordfreq_25k
 ```
 
 This installs vocabulary files under `~/.local/share/library-of-babel/vocabulary/`.
 
-### Testing and Validation
-
-Run all validation commands from the repository root:
+### Testing and Validation (from repository root)
 
 ```bash
-ruff check .
-mypy src
-pytest -q
+uv run ruff check .
+uv run mypy src
+uv run pytest -q
 ```
 
 What each command covers:
 
-- `ruff check .` — linting and import/style checks
-- `mypy src` — static type checking for application code
-- `pytest -q` — unit and CLI smoke tests
+- `uv run ruff check .` — linting and import/style checks
+- `uv run mypy src` — static type checking for application code
+- `uv run pytest -q` — unit and CLI smoke tests
 
 ### CI
 
-GitHub Actions runs the test suite from `.github/workflows/ci.yml` on pushes to `main` and on pull requests. The workflow installs the package and runs:
+GitHub Actions runs the test suite from `.github/workflows/ci.yml` on pushes to `main` and on pull requests. The workflow installs dependencies with uv and runs:
 
 ```bash
-pytest -q
+uv sync --dev
+uv run pytest -q
 ```
 
 ## Project Reference
@@ -100,16 +143,16 @@ The app will automatically look for installed vocabularies in:
 
 ```bash
 # List all known vocabulary sources and their installation status
-library-of-babel vocab-list-sources
+uv run library-of-babel vocab-list-sources
 
 # Install the wordfreq top-25k English vocabulary (auto-download)
-library-of-babel setup-vocab --source wordfreq_25k
+uv run library-of-babel setup-vocab --source wordfreq_25k
 
 # Install all sources that have an automatic download URL
-library-of-babel setup-vocab --all
+uv run library-of-babel setup-vocab --all
 
 # Re-install a source (overwrite existing)
-library-of-babel setup-vocab --source wordfreq_25k --force
+uv run library-of-babel setup-vocab --source wordfreq_25k --force
 ```
 
 ### Manual vocabulary
@@ -117,7 +160,7 @@ library-of-babel setup-vocab --source wordfreq_25k --force
 You can also pass a vocabulary file path directly on any command:
 
 ```bash
-library-of-babel metrics --vocab /path/to/words.txt
+uv run library-of-babel metrics --vocab /path/to/words.txt
 ```
 
 A small demo vocabulary is included at `data/vocabulary/demo.txt`.
@@ -126,31 +169,31 @@ A small demo vocabulary is included at `data/vocabulary/demo.txt`.
 
 ```bash
 # Show info
-library-of-babel info
+uv run library-of-babel info
 
 # List known vocabulary sources
-library-of-babel vocab-list-sources
+uv run library-of-babel vocab-list-sources
 
 # Install default vocabulary (auto-download)
-library-of-babel setup-vocab --source wordfreq_25k
+uv run library-of-babel setup-vocab --source wordfreq_25k
 
 # Vocabulary statistics (uses installed vocabulary automatically)
-library-of-babel vocab-info
+uv run library-of-babel vocab-info
 
 # Or with an explicit file
-library-of-babel vocab-info --vocab data/vocabulary/demo.txt
+uv run library-of-babel vocab-info --vocab data/vocabulary/demo.txt
 
 # Metrics for a specific mode (uses installed vocabulary)
-library-of-babel metrics --mode unrestricted-words
+uv run library-of-babel metrics --mode unrestricted-words
 
 # Or with an explicit vocab file
-library-of-babel metrics --mode unrestricted-words --vocab data/vocabulary/demo.txt
+uv run library-of-babel metrics --mode unrestricted-words --vocab data/vocabulary/demo.txt
 
 # Generate page 3 of a deterministic book (uses installed vocabulary)
-library-of-babel page --mode fixed-sentence --seed "my-book" --page 3
+uv run library-of-babel page --mode fixed-sentence --seed "my-book" --page 3
 
 # Compare all modes (uses installed vocabulary)
-library-of-babel compare
+uv run library-of-babel compare
 ```
 
 ### Implemented Modes
