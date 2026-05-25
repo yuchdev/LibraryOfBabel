@@ -3,52 +3,41 @@
 ## Table of Contents
 
 - [Abstract](#abstract)
-- [1. Original Borges Library](#1-original-borges-library)
-- [2. Word-Based Library](#2-word-based-library)
-  - [Motivation](#motivation)
-  - [Python Generator](#python-generator)
-- [3. Punctuation-Constrained Library](#3-punctuation-constrained-library)
-  - [Constraint](#constraint)
-  - [Combinatorics](#combinatorics)
-  - [Python Implementation](#python-implementation)
-- [4. Sentence-Structured Library](#4-sentence-structured-library)
-  - [Constraint](#constraint-1)
-  - [Python Generator](#python-generator-1)
-- [5. Grammar-Constrained Library](#5-grammar-constrained-library)
-  - [Constraint](#constraint-2)
-  - [Combinatorics](#combinatorics-1)
-  - [Python Implementation](#python-implementation-1)
-- [6. Semantic-Constrained Library](#6-semantic-constrained-library)
-  - [Constraint](#constraint-3)
-  - [Markov Formulation](#markov-formulation)
-  - [Python Implementation](#python-implementation-2)
-- [7. Topic-Coherent Library](#7-topic-coherent-library)
-  - [Constraint](#constraint-4)
-  - [Information-Theoretic Interpretation](#information-theoretic-interpretation)
-- [8. Final Observation](#8-final-observation)
+- [Historical Reference: Original Borges Combinatoric Baseline](#historical-reference-original-borges-combinatoric-baseline)
+- [Stage 0: The English-Language Borges Baseline](#stage-0-the-english-language-borges-baseline)
+- [Stage 1: The Lexical Reduction Model](#stage-1-the-lexical-reduction-model)
+- [Stage 2: The Syntactic Reduction Model (Punctuation Constraint)](#stage-2-the-syntactic-reduction-model-punctuation-constraint)
+- [Stage 3: The Sentence-Structured Uniformity Constraint](#stage-3-the-sentence-structured-uniformity-constraint)
+- [Stage 4: The Categorical Context-Free Grammar Constraint](#stage-4-the-categorical-context-free-grammar-constraint)
+- [Stage 5: The Markovian Semantic Adjacency Constraint](#stage-5-the-markovian-semantic-adjacency-constraint)
+- [Stage 6: Topic-Coherent Manifolds via Latent Space Vectorization](#stage-6-topic-coherent-manifolds-via-latent-space-vectorization)
+- [Stage 7: Deterministic Neural Generative Steganography and Arithmetic Coding](#stage-7-deterministic-neural-generative-steganography-and-arithmetic-coding)
+- [Stage 8: Reversible Generative Flow Models](#stage-8-reversible-generative-flow-models)
+- [Final Observation](#final-observation)
 
 ---
 
 ## Abstract
 
-This article investigates a sequence of mathematical transformations of *The Library of Babel*, originally proposed by Jorge Luis Borges. Starting from the classical combinatoric construction containing every possible sequence of characters, we progressively constrain the Library so that:
+This teaser summarizes a sequence of mathematical transformations of *The Library of Babel*. The historical Borges model is kept as a reference, but the progressive model chain starts with a normalized English-language Stage 0 so that every later comparison uses the same symbol inventory.
 
-1. the number of possible books decreases;
-2. the average semantic density increases;
-3. random pages become increasingly human-readable.
+The shared rule is simple: the model may change the unit of generation, but it must not silently change the alphabet. At token level, all stages use the same punctuation pool:
 
-At each stage we introduce:
+```math
+P = \{\mathtt{.},\ \mathtt{?},\ \mathtt{,},\ \mathtt{!}\}, \qquad |P| = 4.
+```
 
-- a mathematical model;
-- combinatoric analysis;
-- asymptotic reduction;
-- Python algorithms capable of generating pages on demand from compact seeds.
+The common token alphabet is therefore:
 
-The experiment reveals a transition from pure entropy toward structured language and eventually toward semantic manifolds approximating meaningful literature.
+```text
+word . ? , !
+```
+
+The sequence moves from character-level entropy to lexical, syntactic, grammatical, semantic, topical, and eventually neural/reversible constraints.
 
 ---
 
-## 1. Original Borges Library
+## Historical Reference: Original Borges Combinatoric Baseline
 
 Borges defines books with:
 
@@ -60,146 +49,138 @@ Borges defines books with:
 Total character positions:
 
 ```math
-C = 410 \times 40 \times 80
+C = 410 \times 40 \times 80 = 1{,}312{,}000.
 ```
 
-```math
-410 \times 40 \times 80 = 1{,}312{,}000
-```
-
-Total number of books:
-
-```math
-25^{1{,}312{,}000}
-```
-
-Approximation:
+Historical Borges state space:
 
 ```math
 25^{1{,}312{,}000}
 \approx
-1.95 \times 10^{1{,}834{,}097}
+1.95 \times 10^{1{,}834{,}097}.
 ```
 
-This construction maximizes entropy but minimizes meaning.
-
-Almost every book is unreadable noise.
+This model is the historical reference, but it is not the comparison baseline for the English token models because it uses a different alphabet.
 
 ---
 
-## 2. Word-Based Library
+## Stage 0: The English-Language Borges Baseline
 
-### Motivation
-
-Human language is not constructed from arbitrary character sequences.
-
-Replacing characters with words immediately injects semantic structure.
-
-Assume:
-
-- vocabulary size:
-
-  ```math
-  W = 100{,}000
-  ```
-
-- punctuation symbols:
-
-  ```math
-  P = 6
-  ```
-
-- average token width is approximately 6 characters.
-
-Approximate token slots:
+Stage 0 preserves Borges' physical book geometry but normalizes the character alphabet to the English symbols used by every later model:
 
 ```math
-N \approx \frac{1{,}312{,}000}{6}
+A_{\mathrm{en}} = \{a,b,\ldots,z,\ \text{space},\ \mathtt{.},\ \mathtt{?},\ \mathtt{,},\ \mathtt{!}\},
+\qquad |A_{\mathrm{en}}| = 31.
 ```
+
+The number of independent character slots remains:
 
 ```math
-N \approx \frac{1{,}312{,}000}{6} \approx 218{,}667
+C = 1{,}312{,}000.
 ```
 
-Total books:
+The normalized English baseline is therefore:
 
 ```math
-(100{,}006)^{218{,}667}
+31^{1{,}312{,}000}.
 ```
 
-Approximation:
+In base-10 scale:
 
 ```math
-(100{,}006)^{218{,}667}
-\approx
-10^{1{,}093{,}340}
+\log_{10}(31^{1{,}312{,}000}) \approx 1{,}956{,}667.
 ```
 
-The Library shrinks enormously while readability increases dramatically.
+Stage 0 contains approximately:
 
-### Python Generator
+```math
+10^{1{,}956{,}667}
+```
+
+possible books. All later reductions are measured against this shared English-symbol baseline.
 
 ```python
 import hashlib
 
-VOCABULARY = ["the", "house", "river", "memory", "darkness"]
+ENGLISH_CHARACTER_ALPHABET = list("abcdefghijklmnopqrstuvwxyz ") + [".", "?", ",", "!"]
 
-def token_at(seed: str, position: int):
-    data = f"{seed}:{position}".encode("utf-8")
+def character_at(seed: str, position: int) -> str:
+    data = f"{seed}:stage0:{position}".encode("utf-8")
     digest = hashlib.sha256(data).digest()
     value = int.from_bytes(digest[:8], "big")
-    return VOCABULARY[value % len(VOCABULARY)]
-
-def generate_page(seed, page, tokens_per_page=300):
-    start = page * tokens_per_page
-    return [
-        token_at(seed, i)
-        for i in range(start, start + tokens_per_page)
-    ]
+    return ENGLISH_CHARACTER_ALPHABET[value % len(ENGLISH_CHARACTER_ALPHABET)]
 ```
-
-The complete book never needs to exist in memory.
 
 ---
 
-## 3. Punctuation-Constrained Library
+## Stage 1: The Lexical Reduction Model
 
-### Constraint
+Human language is not constructed from arbitrary character sequences. Stage 1 replaces character-level generation with token-level generation.
 
-No two punctuation marks may appear consecutively.
+Assume:
 
-This removes sequences like:
+```math
+W = 100{,}000, \qquad P = 4.
+```
+
+Using an average token width of approximately 6 characters, the token capacity of the same Borges-sized book is:
+
+```math
+N \approx \frac{1{,}312{,}000}{6} \approx 218{,}667.
+```
+
+The lexical state space is:
+
+```math
+(W+P)^N = (100{,}000 + 4)^{218{,}667} = (100{,}004)^{218{,}667}.
+```
+
+In base-10 scale:
+
+```math
+(100{,}004)^{218{,}667} \approx 10^{1{,}093{,}339}.
+```
+
+```python
+VOCABULARY_POOL = ["the", "house", "river", "memory", "darkness"]
+PUNCTUATION_POOL = [".", "?", ",", "!"]
+COMBINED_LEXICAL_POOL = VOCABULARY_POOL + PUNCTUATION_POOL
+
+def lexical_token_at(seed: str, position: int) -> str:
+    data = f"{seed}:stage1:{position}".encode("utf-8")
+    digest = hashlib.sha256(data).digest()
+    value = int.from_bytes(digest[:8], "big")
+    return COMBINED_LEXICAL_POOL[value % len(COMBINED_LEXICAL_POOL)]
+```
+
+---
+
+## Stage 2: The Syntactic Reduction Model (Punctuation Constraint)
+
+Stage 2 keeps the same vocabulary and punctuation pool, but forbids adjacent punctuation. This removes structurally invalid sequences such as:
 
 ```text
 word . ? , !
 ```
 
-which are structurally invalid.
-
-### Combinatorics
-
-If exactly $k$ punctuation marks appear, the number of valid placements without adjacency is:
+If exactly $k$ punctuation marks appear in a sequence of $N$ tokens, valid non-adjacent placements are counted by:
 
 ```math
-\binom{N-k+1}{k}
+\binom{N-k+1}{k}.
 ```
 
-Therefore, the total Library size is:
+The total state space is:
 
 ```math
 \sum_{k=0}^{\lfloor(N+1)/2\rfloor}
 \binom{N-k+1}{k}
 P^k
-W^{N-k}
+W^{N-k}.
 ```
-
-This slightly reduces entropy while improving grammatical plausibility.
-
-### Python Implementation
 
 ```python
 def valid_sequence(tokens):
-    punct = {".", ",", ";", ":", "?", "!"}
+    punct = {".", "?", ",", "!"}
 
     for i in range(len(tokens) - 1):
         if tokens[i] in punct and tokens[i + 1] in punct:
@@ -210,14 +191,9 @@ def valid_sequence(tokens):
 
 ---
 
-## 4. Sentence-Structured Library
+## Stage 3: The Sentence-Structured Uniformity Constraint
 
-### Constraint
-
-Every sentence must contain:
-
-- exactly 15 words;
-- followed by one punctuation mark.
+Stage 3 forces a fixed sentence-like block structure: exactly 15 words followed by exactly one punctuation token from the shared punctuation pool. Because comma is retained, the block should be understood as a sentence-or-clause block rather than only a final sentence terminator.
 
 Pattern:
 
@@ -225,250 +201,164 @@ Pattern:
 W W W W W W W W W W W W W W W P
 ```
 
-Sentence count:
+The number of complete blocks is:
 
 ```math
-S = \left\lfloor \frac{N}{16} \right\rfloor
+S = \left\lfloor \frac{N}{16} \right\rfloor.
 ```
 
-Total Library:
+With $N \approx 218{,}667$, this gives $S \approx 13{,}666$. The state space is:
 
 ```math
-W^{15S} P^S
-```
-
-Approximation:
-
-```math
-W^{15S} P^S
+W^{15S}P^S
 \approx
-10^{1{,}035{,}639}
+(100{,}000)^{204{,}990} \times 4^{13{,}666}
+\approx
+10^{1{,}033{,}178}.
 ```
-
-The Library loses vast amounts of entropy while gaining strong textual regularity.
-
-Random pages now resemble primitive prose.
-
-### Python Generator
 
 ```python
-WORDS_PER_SENTENCE = 15
+WORDS_PER_SENTENCE_BLOCK = 15
+BLOCK_PUNCTUATION_POOL = [".", "?", ",", "!"]
 
-PUNCT = [".", "?", "!"]
-
-def sentence(seed, index):
+def sentence_block(seed: str, block_index: int) -> str:
     words = [
-        token_at(seed, index * 16 + i)
-        for i in range(WORDS_PER_SENTENCE)
+        lexical_token_at(seed, block_index * 16 + i)
+        for i in range(WORDS_PER_SENTENCE_BLOCK)
     ]
 
-    punct = PUNCT[
-        hash(f"{seed}:{index}") % len(PUNCT)
-    ]
+    data = f"{seed}:stage3:punct:{block_index}".encode("utf-8")
+    value = int.from_bytes(hashlib.sha256(data).digest()[:8], "big")
+    punct = BLOCK_PUNCTUATION_POOL[value % len(BLOCK_PUNCTUATION_POOL)]
 
     return " ".join(words) + punct
 ```
 
 ---
 
-## 5. Grammar-Constrained Library
+## Stage 4: The Categorical Context-Free Grammar Constraint
 
-### Constraint
+Stage 4 partitions the vocabulary into grammatical categories and forces each block to follow a fixed syntactic template.
 
-Sentences must satisfy grammatical templates.
-
-Example:
+Canonical template:
 
 ```text
-DET ADJ NOUN VERB DET NOUN .
+DET ADJ NOUN VERB DET NOUN PUNCT
 ```
 
-Define vocabulary partitions:
-
-- nouns;
-- verbs;
-- adjectives;
-- adverbs;
-- determiners;
-- pronouns;
-- prepositions.
-
-### Combinatorics
-
-If $D$, $A$, $N$, and $V$ represent category counts, then one sentence template produces:
+For one block, the state space is:
 
 ```math
-D \cdot A \cdot N \cdot V \cdot D \cdot N \cdot P
+|D| \times |A| \times |N| \times |V| \times |D| \times |N| \times |P|.
 ```
 
-possible sentences.
-
-A book with $S$ such sentences gives:
+For $S$ blocks:
 
 ```math
-(DANVDNP)^S
+(D \cdot A \cdot N \cdot V \cdot D \cdot N \cdot P)^S.
 ```
-
-This reduction is enormous.
-
-However, readability increases dramatically.
-
-Random pages now resemble machine-generated language.
-
-### Python Implementation
 
 ```python
-GRAMMAR = [
-    ("DET", ["the", "a"]),
-    ("ADJ", ["dark", "ancient"]),
-    ("NOUN", ["river", "library", "mirror"]),
-    ("VERB", ["contains", "reflects"]),
-    ("DET", ["the", "a"]),
-    ("NOUN", ["truth", "memory"]),
+GRAMMAR_TEMPLATE_DEFINITION = [
+    ("DET", ["the", "a", "every", "no"]),
+    ("ADJ", ["dark", "ancient", "silent", "infinite"]),
+    ("NOUN", ["river", "library", "mirror", "memory"]),
+    ("VERB", ["contains", "reflects", "hides", "echoes"]),
+    ("DET", ["the", "a", "every", "no"]),
+    ("NOUN", ["page", "secret", "shadow", "symbol"]),
 ]
+PUNCTUATION_POOL = [".", "?", ",", "!"]
 
-def grammar_sentence(seed, sentence_id):
+def grammatical_sentence(seed: str, sentence_id: int) -> str:
     words = []
 
-    for i, (_, vocab) in enumerate(GRAMMAR):
-        token = token_at(seed, sentence_id * 100 + i)
-        words.append(vocab[hash(token) % len(vocab)])
+    for index, (_, category_words) in enumerate(GRAMMAR_TEMPLATE_DEFINITION):
+        data = f"{seed}:stage4:{sentence_id}:{index}".encode("utf-8")
+        value = int.from_bytes(hashlib.sha256(data).digest()[:8], "big")
+        words.append(category_words[value % len(category_words)])
 
-    return " ".join(words) + "."
+    data = f"{seed}:stage4:{sentence_id}:punct".encode("utf-8")
+    value = int.from_bytes(hashlib.sha256(data).digest()[:8], "big")
+    punct = PUNCTUATION_POOL[value % len(PUNCTUATION_POOL)]
+
+    return " ".join(words) + punct
 ```
 
 ---
 
-## 6. Semantic-Constrained Library
+## Stage 5: The Markovian Semantic Adjacency Constraint
 
-### Constraint
+Stage 5 replaces independent grammatical choices with a directed semantic graph. A valid book is a path through that graph.
 
-Not all grammatically valid sentences are meaningful.
-
-Introduce semantic neighborhoods.
-
-Example:
-
-```text
-river ↔ water ↔ flow ↔ current
-library ↔ books ↔ shelves ↔ archive
-```
-
-Words may only follow semantically compatible words.
-
-This transforms the Library from a combinatoric explosion into a constrained semantic graph.
-
-### Markov Formulation
-
-Let:
+Let $T$ be an adjacency matrix where $T_{ij}=1$ means token $j$ may follow token $i$. The approximate count of valid sequences is bounded asymptotically by:
 
 ```math
-T_{ij}
+\lambda_{\max}^{N},
 ```
 
-be the transition probability from token $i$ to token $j$.
-
-Then valid books are paths through the semantic graph.
-
-Approximate sequence count:
-
-```math
-\lambda_{\max}^N
-```
-
-where:
-
-```math
-\lambda_{\max}
-```
-
-is the dominant eigenvalue of the transition matrix.
-
-This is a profound reduction.
-
-Meaning emerges from spectral constraints.
-
-### Python Implementation
+where $\lambda_{\max}$ is the dominant eigenvalue of the transition matrix.
 
 ```python
-import random
-
-GRAPH = {
-    "river": ["water", "flow", "stone"],
-    "water": ["current", "river"],
-    "library": ["books", "archive"],
+SEMANTIC_ADJACENCY_GRAPH = {
+    "the": ["ancient", "silent", "infinite", "library", "river"],
+    "ancient": ["library", "river", "memory"],
+    "library": ["contains", "hides", "reveals"],
+    "river": ["reflects", "flows", "carries"],
+    "contains": ["the", "every", "no"],
+    "memory": [".", "?", ",", "!"],
 }
-
-def semantic_walk(seed, start, length):
-    random.seed(seed)
-
-    word = start
-    result = [word]
-
-    for _ in range(length - 1):
-        next_words = GRAPH.get(word, [word])
-        word = random.choice(next_words)
-        result.append(word)
-
-    return result
 ```
 
 ---
 
-## 7. Topic-Coherent Library
+## Stage 6: Topic-Coherent Manifolds via Latent Space Vectorization
 
-### Constraint
+Stage 6 introduces a book-level topic variable. A coordinate chooses a topic vector $t$, and every generated token is biased toward words whose embeddings are close to that topic.
 
-Entire books must remain inside a thematic manifold.
-
-Examples:
-
-- cosmology;
-- grief;
-- mathematics;
-- theology;
-- medieval warfare.
-
-This introduces long-range coherence.
-
-Now the Library approximates actual literature.
-
-### Information-Theoretic Interpretation
-
-The original Borges Library maximizes entropy:
+For a word embedding $v_i$, selection can be modeled as:
 
 ```math
-H_{\max}
+P(w_i) \propto \exp\left(\beta \cdot \operatorname{cos\_sim}(v_i,t)\right).
 ```
 
-Every subsequent constraint reduces entropy:
-
-```math
-H_1 > H_2 > H_3 > H_4
-```
-
-while increasing mutual information:
-
-```math
-I(\text{text}; \text{meaning})
-```
-
-The experiment demonstrates that human-readable language occupies an infinitesimally thin manifold inside the full combinatoric space of possible books.
+This stage adds long-range coherence: the whole book remains near a thematic manifold such as cosmology, grief, mathematics, theology, or war.
 
 ---
 
-## 8. Final Observation
+## Stage 7: Deterministic Neural Generative Steganography and Arithmetic Coding
 
-The original Library is not terrifying because it contains all books.
+Stage 7 treats the coordinate as a deterministic random bitstream and uses a frozen language model as a probability estimator. Arithmetic decoding maps the coordinate into a sequence of tokens while respecting the model distribution:
 
-It is terrifying because meaningful books are drowned inside an ocean of entropy.
+```math
+P(x_t \mid x_{<t}).
+```
 
-Each constraint introduced in this article:
+The objective is to preserve naturalness while carrying coordinate entropy:
 
-- decreases combinatoric volume;
-- increases semantic density;
-- moves the Library closer to the tiny structured region inhabited by human thought.
+```math
+\max H(Q) \quad \text{subject to} \quad D_{KL}(Q \parallel P) \leq \epsilon.
+```
 
-The true Library of meaning is not infinite.
+This stage is theoretically powerful but requires strict determinism, quantized arithmetic, and a self-hosted model to keep coordinate-to-text mapping reproducible.
 
-It is an extraordinarily compressed island hidden inside Borges' cosmic desert of symbols.
+---
+
+## Stage 8: Reversible Generative Flow Models
+
+Stage 8 is the most speculative endpoint: replace one-way autoregressive generation with reversible generative models. A coordinate maps into a latent vector, the flow maps the latent vector into text, and the inverse flow can verify or reconstruct the coordinate.
+
+This is the mathematically cleanest version of a reversible semantic Library, but it is also the most resource-intensive and research-heavy stage.
+
+---
+
+## Final Observation
+
+The original Library is not terrifying because it contains all books. It is terrifying because meaningful books are drowned inside an ocean of entropy.
+
+The coherent model chain is now:
+
+```text
+Historical Borges reference -> Stage 0 English baseline -> Stage 1 lexical -> Stage 2 punctuation-constrained -> Stage 3 sentence-block structured -> Stage 4 grammatical -> Stage 5 semantic graph -> Stage 6 topic manifold -> Stage 7 neural arithmetic coding -> Stage 8 reversible flows
+```
+
+Each stage decreases combinatoric volume, increases structural or semantic density, and moves the Library closer to the compressed region inhabited by human thought.

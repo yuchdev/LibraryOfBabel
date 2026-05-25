@@ -204,9 +204,9 @@ uv run library-of-babel compare
 | `word-based`              | (W+P)^N                      | Each token can be any word or punctuation.         | Implemented           |
 | `punctuation-constrained` | Σ C(N-k+1,k)·P^k·W^(N-k)     | No two punctuation tokens appear consecutively.    | Implemented           |
 | `sentence-structured`     | W^(S·w)·P^S                  | Fixed-length sentences (15 words + end punct).     | Implemented           |
-| `grammar-constrained`     | Π(category_size)^repetitions | Tokens follow a fixed cyclic grammar template.     | Implemented (PoC)     |
-| `semantic-constrained`    | W · (W/K + P)^(N-1)          | Connected via mock semantic clusters (hash-based). | Implemented (PoC)     |
-| `topic-coherent`          | W · (T + P)^N                | Restricted to a deterministic vocabulary subset.   | Implemented (PoC)     |
+| `grammar-constrained`     | Π(category_size)^repetitions | Tokens follow a fixed cyclic grammar template.     | Stub                  |
+| `semantic-constrained`    | W · (W/K + P)^(N-1)          | Connected via mock semantic clusters (hash-based). | Stub                  |
+| `topic-coherent`          | W · (T + P)^N                | Restricted to a deterministic vocabulary subset.   | Stub                  |
 
 ### Known Limitations
 

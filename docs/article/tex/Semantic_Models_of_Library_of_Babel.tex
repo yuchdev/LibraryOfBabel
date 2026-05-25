@@ -353,6 +353,7 @@ def generate_structured_sentence(seed_coordinate: str, sentence_index: int) -> s
 
     # Concatenate the words and append the punctuation directly to the final word return " ".join(sentence_words) + block_punctuation \end{lstlisting}
 
+
 \subsection{Stage 4: The Categorical Context-Free Grammar Constraint}\label{stage-4-the-categorical-context-free-grammar-constraint}
 
 The leap from rhythmic gibberish to structural syntax requires applying the principles of computational linguistics, specifically Context-Free Grammars (CFGs). By categorically partitioning the vocabulary into distinct parts of speech (POS) and forcing the sentence generation to strictly follow syntactical templates, we emulate the mechanical scaffolding of true language.\textsuperscript{8}
@@ -361,11 +362,13 @@ The leap from rhythmic gibberish to structural syntax requires applying the prin
 
 Let the global vocabulary pool be partitioned into mutually exclusive subsets based on linguistic function: Determiners (\(D\)), Adjectives (\(A\)), Nouns (\(N\)), Verbs (\(V\)), Prepositions (\(Prep\)), Adverbs (\(Adv\)), etc.
 
-If we enforce a single, strict syntactic sequence template for every sentence in the library, such as the basic active-voice structure:
+For the model chain in this article, the canonical Stage 4 template is:
 
-{[}Adjective{]}{[}Noun{]}{[}Verb{]}{[}Noun{]}
+\begin{lstlisting}[style=babelpython]
+DET ADJ NOUN VERB DET NOUN PUNCT
+\end{lstlisting}
 
-Here \(P\) is still the same four-symbol punctuation pool \(\{\mathtt{.}, \mathtt{?}, \mathtt{,}, \mathtt{!}\}\) defined in Stage 0. The combinatorial space for generating a single valid sentence under this template is the Cartesian product of the specific subset sizes:
+Here \(PUNCT\) is not a separate ad-hoc period-only terminal. It ranges over the same four-symbol punctuation pool \(P=\{\mathtt{.}, \mathtt{?}, \mathtt{,}, \mathtt{!}\}\) defined in Stage 0. The combinatorial space for generating a single valid sentence-like block under this template is therefore the Cartesian product of the specific subset sizes:
 
 \[
 |D| \times |A| \times |N| \times |V| \times |D| \times |N| \times |P|
@@ -373,7 +376,7 @@ Here \(P\) is still the same four-symbol punctuation pool \(\{\mathtt{.}, \matht
 
 \textsuperscript{8}
 
-For a complete book containing \(S\) sentences, the total state space formula scales to:
+For a complete book containing \(S\) such blocks, the total state space formula scales to:
 
 \[
 \text{Total Grammatical Books}=(D \cdot A \cdot N \cdot V \cdot D \cdot N \cdot P)^S
@@ -381,7 +384,7 @@ For a complete book containing \(S\) sentences, the total state space formula sc
 
 \textsuperscript{8}
 
-This constraint causes an enormous compression of the total combinatoric volume. Because the algorithm is no longer permitted to draw arbitrarily from the 100,000-word pool, but only from specific subsets at specific indices, millions of permutations are invalidated. Though semantically disjointed, the generated output reads as grammatically flawless, surrealist text (e.g., ``The dark memory reflects a river.'').
+This constraint causes an enormous compression of the total combinatoric volume. Because the algorithm is no longer permitted to draw arbitrarily from the 100,000-word pool, but only from specific subsets at specific indices, millions of permutations are invalidated. Though semantically disjointed, the generated output reads as grammatically regular surrealist text.
 
 \begin{lstlisting}[style=babelpython]
 # Partitioning the vocabulary into strict linguistic categories
@@ -393,15 +396,31 @@ GRAMMAR_TEMPLATE_DEFINITION = [
     ("DET", ["the", "a", "every", "no"]),
     ("NOUN", ["page", "secret", "shadow", "void", "symbol", "axiom"]),
 ]
+PUNCTUATION_POOL = [".", "?", ",", "!"]
 
 
-def generate_grammatical_sentence(seed_coordinate: str, sentence_id: int) -> str: """ Iterates through a rigid part-of-speech template to construct a grammatically sound, albeit semantically arbitrary, sentence. """ constructed_words = []
+def generate_grammatical_sentence(seed_coordinate: str, sentence_id: int) -> str:
+    """
+    Iterates through a rigid part-of-speech template to construct a grammatically
+    regular, albeit semantically arbitrary, sentence-like block.
+    """
+    constructed_words = []
 
-    # Iterate strictly through the categorical template structure for structural_index, (pos_category, pos_vocabulary_subset) in enumerate(GRAMMAR_TEMPLATE_DEFINITION): encoded_data = f"{seed_coordinate}:grammar_stage:{sentence_id}:pos_index:{structural_index}".encode("utf-8") pseudo_random_value = int.from_bytes(hashlib.sha256(encoded_data).digest()[:8], "big")
+    # Iterate strictly through the categorical template structure
+    for structural_index, (pos_category, pos_vocabulary_subset) in enumerate(GRAMMAR_TEMPLATE_DEFINITION):
+        encoded_data = f"{seed_coordinate}:grammar_stage:{sentence_id}:pos_index:{structural_index}".encode("utf-8")
+        pseudo_random_value = int.from_bytes(hashlib.sha256(encoded_data).digest()[:8], "big")
 
-        # Select a word exclusively from the isolated part-of-speech pool selected_word = pos_vocabulary_subset[pseudo_random_value % len(pos_vocabulary_subset)] constructed_words.append(selected_word)
+        # Select a word exclusively from the isolated part-of-speech pool
+        selected_word = pos_vocabulary_subset[pseudo_random_value % len(pos_vocabulary_subset)]
+        constructed_words.append(selected_word)
 
-    return " ".join(constructed_words) + "." \end{lstlisting}
+    encoded_punct_data = f"{seed_coordinate}:grammar_stage:{sentence_id}:punct".encode("utf-8")
+    punct_value = int.from_bytes(hashlib.sha256(encoded_punct_data).digest()[:8], "big")
+    punctuation = PUNCTUATION_POOL[punct_value % len(PUNCTUATION_POOL)]
+
+    return " ".join(constructed_words) + punctuation
+\end{lstlisting}
 
 \subsection{Stage 5: The Markovian Semantic Adjacency Constraint}\label{stage-5-the-markovian-semantic-adjacency-constraint}
 
@@ -600,7 +619,7 @@ This cascading mathematical reduction demonstrates a profound realization concer
   The Library of Babel - Wikipedia, accessed May 25, 2026,
   \url{https://en.wikipedia.org/wiki/The_Library_of_Babel}
 \item
-  The Library of Babel and Infinite Monkeys · Open Readings · HUM 11c Omeka, accessed May 25, 2026,
+  The Library of Babel and Infinite Monkeys $\cdot$ Open Readings $\cdot$ HUM 11c Omeka, accessed May 25, 2026,
   \url{https://hum11c.omeka.fas.harvard.edu/exhibits/show/open-readings/the-library-of-babel-and-infin}
 \item
   ELI5: How is the Library of Babel website isn't lagging like crazy? - Reddit, accessed May 25, 2026,
@@ -635,7 +654,7 @@ This cascading mathematical reduction demonstrates a profound realization concer
   NYU Theory Seminar - Theoretical Computer Science at NYU - New York University, accessed May 25, 2026,
   \url{https://csefoundations.engineering.nyu.edu/seminar.html}
 \item
-  Thermodynamics ≠ Information Theory: Science's Greatest Sokal Affair, accessed May 25, 2026,
+  Thermodynamics $\ne$ Information Theory: Science's Greatest Sokal Affair, accessed May 25, 2026,
   \url{https://www.informationphilosopher.com/solutions/scientists/thims/TNETIT.pdf}
 \item
   {[}Request{]} How many `possible' pages would it take for this to be possible? : r/theydidthemath, accessed May 25, 2026,
@@ -644,7 +663,7 @@ This cascading mathematical reduction demonstrates a profound realization concer
   Can finding a meaningful page in the library of babel be counted as an NP-problem? : r/AskComputerScience - Reddit, accessed May 25, 2026,
   \url{https://www.reddit.com/r/AskComputerScience/comments/178dyjr/can_finding_a_meaningful_page_in_the_library_of/}
 \item
-  The Magnitude of a Graph \textbar{} The n-Category Café - Welcome, accessed May 25, 2026,
+  The Magnitude of a Graph \textbar{} The n-Category Cafe - Welcome, accessed May 25, 2026,
   \url{https://golem.ph.utexas.edu/category/2014/01/the_magnitude_of_a_graph.html}
 \item
   Spring 2021 : Math 554 Discrete Applied Math II - Applied Mathematics, accessed May 25, 2026,

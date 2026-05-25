@@ -323,25 +323,27 @@ The leap from rhythmic gibberish to structural syntax requires applying the prin
 
 Let the global vocabulary pool be partitioned into mutually exclusive subsets based on linguistic function: Determiners ($D$), Adjectives ($A$), Nouns ($N$), Verbs ($V$), Prepositions ($Prep$), Adverbs ($Adv$), etc.
 
-If we enforce a single, strict syntactic sequence template for every sentence in the library, such as the basic active-voice structure:
+For the model chain in this article, the canonical Stage 4 template is:
 
-[Adjective][Noun][Verb][Noun]
+```text
+DET ADJ NOUN VERB DET NOUN PUNCT
+```
 
-Here $P$ is still the same four-symbol punctuation pool $\{\mathtt{.}, \mathtt{?}, \mathtt{,}, \mathtt{!}\}$ defined in Stage 0. The combinatorial space for generating a single valid sentence under this template is the Cartesian product of the specific subset sizes:
+Here $PUNCT$ is not a separate ad-hoc period-only terminal. It ranges over the same four-symbol punctuation pool $P=\{\mathtt{.}, \mathtt{?}, \mathtt{,}, \mathtt{!}\}$ defined in Stage 0. The combinatorial space for generating a single valid sentence-like block under this template is therefore the Cartesian product of the specific subset sizes:
 
 ```math
 |D| \times |A| \times |N| \times |V| \times |D| \times |N| \times |P|
 ```
 [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
-For a complete book containing $S$ sentences, the total state space formula scales to:
+For a complete book containing $S$ such blocks, the total state space formula scales to:
 
 ```math
 \text{Total Grammatical Books}=(D \cdot A \cdot N \cdot V \cdot D \cdot N \cdot P)^S
 ```
 [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
-This constraint causes an enormous compression of the total combinatoric volume. Because the algorithm is no longer permitted to draw arbitrarily from the 100,000-word pool, but only from specific subsets at specific indices, millions of permutations are invalidated. Though semantically disjointed, the generated output reads as grammatically flawless, surrealist text (e.g., "The dark memory reflects a river.").
+This constraint causes an enormous compression of the total combinatoric volume. Because the algorithm is no longer permitted to draw arbitrarily from the 100,000-word pool, but only from specific subsets at specific indices, millions of permutations are invalidated. Though semantically disjointed, the generated output reads as grammatically regular surrealist text.
 
 ```python
 # Partitioning the vocabulary into strict linguistic categories
@@ -353,12 +355,13 @@ GRAMMAR_TEMPLATE_DEFINITION = [
     ("DET", ["the", "a", "every", "no"]),
     ("NOUN", ["page", "secret", "shadow", "void", "symbol", "axiom"]),
 ]
+PUNCTUATION_POOL = [".", "?", ",", "!"]
 
 
 def generate_grammatical_sentence(seed_coordinate: str, sentence_id: int) -> str:
     """
     Iterates through a rigid part-of-speech template to construct a grammatically
-    sound, albeit semantically arbitrary, sentence.
+    regular, albeit semantically arbitrary, sentence-like block.
     """
     constructed_words = []
 
@@ -371,7 +374,11 @@ def generate_grammatical_sentence(seed_coordinate: str, sentence_id: int) -> str
         selected_word = pos_vocabulary_subset[pseudo_random_value % len(pos_vocabulary_subset)]
         constructed_words.append(selected_word)
 
-    return " ".join(constructed_words) + "."
+    encoded_punct_data = f"{seed_coordinate}:grammar_stage:{sentence_id}:punct".encode("utf-8")
+    punct_value = int.from_bytes(hashlib.sha256(encoded_punct_data).digest()[:8], "big")
+    punctuation = PUNCTUATION_POOL[punct_value % len(PUNCTUATION_POOL)]
+
+    return " ".join(constructed_words) + punctuation
 ```
 
 ## Stage 5: The Markovian Semantic Adjacency Constraint
