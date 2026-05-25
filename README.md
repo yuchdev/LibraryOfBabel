@@ -123,94 +123,81 @@ uv run pytest -q
 
 ## Project Reference
 
-### Mathematical Idea
+### Mathematical Idea (Article-Aligned)
 
-The Library of Babel contains every possible book of 410 pages, each page having 40 lines of 80 characters from a 25-character alphabet. Its size is approximately 10^1,834,097.
+- Historical Borges reference: `25^1,312,000` (documentation baseline)
+- Stage 0 application baseline (English normalized): `31^1,312,000`
+- Token stages use `N = 218,667` token slots/book and shared punctuation `P = 4` with:
+  - punctuation alphabet: `. ? , !`
 
-This application models the library using word tokens instead of characters, exploring how different grammatical constraints affect the library's size.
+### Canonical Model Chain
 
-See the detailed model description in [docs/Semantic_Models_of_Library_of_Babel_teaser.md](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md).
+| Stage | Canonical article name | App mode id | Formula | Implementation status |
+|---:|---|---|---|---|
+| Historical reference | Original Borges Historical Library | docs/reference only | `25^1,312,000` | Theoretical reference |
+| 0 | English-Language Borges Baseline | `borges-library` | `31^1,312,000` | Implemented (canonical) |
+| 1 | Lexical Reduction Model | `word-based` | `(W + P)^N` | Implemented (canonical) |
+| 2 | Syntactic Reduction Model (Punctuation Constraint) | `punctuation-constrained` | `Σ binom(N-k+1,k) P^k W^(N-k)` | Implemented (canonical) |
+| 3 | Sentence-Structured Uniformity Constraint | `sentence-structured` | `W^(15S) P^S`, `S=floor(N/16)` | Implemented (canonical) |
+| 4 | Categorical Grammar Constraint | `grammar-constrained` | `(D·A·N·V·D·N·P)^R` | Implemented (lightweight POS fallback) |
+| 5 | Markovian Semantic Adjacency Constraint | `semantic-constrained` | `≈ λ_max^N` | Implemented (lightweight deterministic graph) |
+| 6 | Topic-Coherent Manifold / Topic-Constrained Vocabulary Model | `topic-coherent` | `Σ_topic (|V_topic|+P)^N` | Implemented (lightweight explicit topics) |
+| 7 | Deterministic Neural Generative Steganography / Arithmetic Coding | article-only | article-only | Future/theoretical |
+| 8 | Reversible Generative Flow Models | article-only | article-only | Future/theoretical |
 
-### Dataset Preparation
+### Theoretical vs Preview Size
 
-The app will automatically look for installed vocabularies in:
+- `metrics` computes full theoretical book-space sizes (fixed stage constants).
+- `page` generates only the requested preview page deterministically.
+- Full-book materialization is intentionally unsupported.
 
-```
-~/.local/share/library-of-babel/vocabulary/
-```
+### Data Sources and Model Suitability
+
+| Source | Suitable stages | Notes |
+|---|---|---|
+| `wordfreq_25k` | Stage 1–3, demo Stage 6 | Easy default lexical vocabulary |
+| `scowl` | Stage 1–3 | Broad spelling list, not POS/semantic by default |
+| `subtlex_us` | Stage 1–3 | Spoken/common vocabulary |
+| `wordnet` | Stage 4–5 | POS-aware and semantic-friendly source |
 
 ### Installing vocabularies (recommended)
 
 ```bash
-# List all known vocabulary sources and their installation status
 uv run library-of-babel vocab-list-sources
-
-# Install the wordfreq top-25k English vocabulary (auto-download)
 uv run library-of-babel setup-vocab --source wordfreq_25k
-
-# Install all sources that have an automatic download URL
 uv run library-of-babel setup-vocab --all
-
-# Re-install a source (overwrite existing)
 uv run library-of-babel setup-vocab --source wordfreq_25k --force
 ```
 
-### Manual vocabulary
-
-You can also pass a vocabulary file path directly on any command:
+### Metrics Examples (all implemented modes)
 
 ```bash
-uv run library-of-babel metrics --vocab /path/to/words.txt
-```
-
-A small demo vocabulary is included at `data/vocabulary/demo.txt`.
-
-### CLI Examples
-
-```bash
-# Show info
-uv run library-of-babel info
-
-# List known vocabulary sources
-uv run library-of-babel vocab-list-sources
-
-# Install default vocabulary (auto-download)
-uv run library-of-babel setup-vocab --source wordfreq_25k
-
-# Vocabulary statistics (uses installed vocabulary automatically)
-uv run library-of-babel vocab-info
-
-# Or with an explicit file
-uv run library-of-babel vocab-info --vocab data/vocabulary/demo.txt
-
-# Metrics for a specific mode (uses installed vocabulary)
+uv run library-of-babel metrics --mode borges-library
 uv run library-of-babel metrics --mode word-based
-
-# Or with an explicit vocab file
-uv run library-of-babel metrics --mode word-based --vocab data/vocabulary/demo.txt
-
-# Generate page 3 of a deterministic book (uses installed vocabulary)
-uv run library-of-babel page --mode sentence-structured --seed "my-book" --page 3
-
-# Compare all modes (uses installed vocabulary)
-uv run library-of-babel compare
+uv run library-of-babel metrics --mode punctuation-constrained
+uv run library-of-babel metrics --mode sentence-structured
+uv run library-of-babel metrics --mode grammar-constrained
+uv run library-of-babel metrics --mode semantic-constrained
+uv run library-of-babel metrics --mode topic-coherent
 ```
 
-### Implemented Modes
+### Page Examples (all implemented modes)
 
-| Mode                      | Formula                      | Description                                        | Implementation Status |
-|---------------------------|------------------------------|----------------------------------------------------|-----------------------|
-| `borges-library`          | S^N                          | Character-based original model (English alphabet). | Implemented           |
-| `word-based`              | (W+P)^N                      | Each token can be any word or punctuation.         | Implemented           |
-| `punctuation-constrained` | Σ C(N-k+1,k)·P^k·W^(N-k)     | No two punctuation tokens appear consecutively.    | Implemented           |
-| `sentence-structured`     | W^(S·w)·P^S                  | Fixed-length sentences (15 words + end punct).     | Implemented           |
-| `grammar-constrained`     | Π(category_size)^repetitions | Tokens follow a fixed cyclic grammar template.     | Stub                  |
-| `semantic-constrained`    | W · (W/K + P)^(N-1)          | Connected via mock semantic clusters (hash-based). | Stub                  |
-| `topic-coherent`          | W · (T + P)^N                | Restricted to a deterministic vocabulary subset.   | Stub                  |
+```bash
+uv run library-of-babel page --mode borges-library --seed test --page 0
+uv run library-of-babel page --mode word-based --seed test --page 0
+uv run library-of-babel page --mode punctuation-constrained --seed test --page 0
+uv run library-of-babel page --mode sentence-structured --seed test --page 0
+uv run library-of-babel page --mode grammar-constrained --seed test --page 0
+uv run library-of-babel page --mode semantic-constrained --seed test --page 0
+uv run library-of-babel page --mode topic-coherent --seed test --page 0
+```
 
-### Known Limitations
+### Documentation and Tests
 
-- `grammar-constrained` mode uses tiny built-in vocabulary by default
-- `semantic-constrained` and `topic-coherent` use hash-based simulated data (mock clusters/subsets)
-- `punctuation-constrained` `log10_size` uses log-space summation (maybe slow for a very large `N`)
-- Full-book generation is intentionally unsupported
+```bash
+uv run ruff check .
+uv run mypy src
+uv run pytest -q
+uv run pytest --cov=src/babel/generators --cov=src/babel/vocabulary --cov=src/babel/mathlib --cov-report=term-missing
+```

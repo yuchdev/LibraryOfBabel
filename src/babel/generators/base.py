@@ -1,21 +1,33 @@
 from abc import ABC, abstractmethod
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from babel.constants import DEFAULT_PUNCTUATION
+from babel.generators.constants import SHARED_PUNCTUATION
+from babel.generators.metadata import ModelMetadata
 from babel.rendering.page_renderer import render_tokens
 
 
 class BookConfig(BaseModel):
+    """
+    Runtime configuration for deterministic page generation.
+
+    Notes:
+      - `tokens_per_page` is a preview/rendering control for CLI/API page output.
+      - Theoretical model sizes are computed from stage constants, not preview size.
+    """
+
     mode_id: str
     seed: str
     pages: int = 410
     tokens_per_page: int = 320
     vocabulary_id: str = "unknown"
-    punctuation: list[str] = DEFAULT_PUNCTUATION
+    punctuation: list[str] = Field(default_factory=lambda: list(DEFAULT_PUNCTUATION))
 
 
 class GeneratedPage(BaseModel):
+    """Generated page payload containing token stream and rendered text."""
+
     book_config: BookConfig
     page_index: int
     tokens: list[str]
@@ -23,12 +35,31 @@ class GeneratedPage(BaseModel):
 
 
 class LibraryGenerator(ABC):
+    """
+    Base interface for all Stage 0–6 generators in the article-aligned chain.
+
+    Subclasses provide:
+      - metadata (stage name, formula, implementation level)
+      - log10_size() for theoretical size calculations
+      - generate_token()/generate_page() for deterministic local preview generation
+    """
+
     mode_id: str
-    display_name: str
+    metadata: ModelMetadata
 
     def __init__(self, words: list[str], punctuation: list[str]) -> None:
         self.words = words
-        self.punctuation = punctuation
+        if punctuation and punctuation != SHARED_PUNCTUATION:
+            mode_name = getattr(self, "mode_id", self.__class__.__name__)
+            raise ValueError(
+                f"{mode_name} requires shared punctuation "
+                f"{SHARED_PUNCTUATION}, got {punctuation}"
+            )
+        self.punctuation = list(SHARED_PUNCTUATION)
+
+    @property
+    def display_name(self) -> str:
+        return self.metadata.display_name
 
     @abstractmethod
     def log10_size(self, pages: int = 410, tokens_per_page: int = 320) -> float:

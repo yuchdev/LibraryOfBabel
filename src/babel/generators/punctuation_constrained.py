@@ -1,22 +1,54 @@
 from babel.generators.base import BookConfig, GeneratedPage, LibraryGenerator
+from babel.generators.constants import SHARED_PUNCTUATION, TOKEN_SLOTS_PER_BOOK
+from babel.generators.metadata import ModelMetadata
 from babel.mathlib.combinatorics import log10_no_adjacent_punct
 from babel.rendering.page_renderer import render_tokens
 from babel.utils.hashing import deterministic_index
 
 
 class PunctuationConstrainedGenerator(LibraryGenerator):
+    """
+    Stage 2 Syntactic Reduction Model with punctuation adjacency constraints.
+
+    Theoretical basis:
+      - Stage 2 "Syntactic Reduction Model (Punctuation Constraint)"
+    Formula:
+      - Σ binom(N-k+1,k) P^k W^(N-k), k=0..floor((N+1)/2)
+    Data requirements:
+      - words.txt vocabulary
+      - shared punctuation `. ? , !`
+    Implementation level:
+      - canonical
+    Example:
+      - uv run library-of-babel page --mode punctuation-constrained --seed test --page 0
+    Tests:
+      - tests/test_punctuation_constrained.py
+      - tests/mathlib/test_combinatorics.py
+      - tests/test_determinism.py
+    """
+
     mode_id = "punctuation-constrained"
-    display_name = "Punctuation-Constrained Library"
+    metadata = ModelMetadata(
+        mode_id=mode_id,
+        stage_number=2,
+        display_name="Stage 2: Syntactic Reduction Model (Punctuation Constraint)",
+        article_model_name="Syntactic Reduction Model (Punctuation Constraint)",
+        formula="Σ binom(N-k+1,k) P^k W^(N-k)",
+        implementation_level="canonical",
+        required_data=["words.txt"],
+    )
 
     def log10_size(self, pages: int = 410, tokens_per_page: int = 320) -> float:
-        n = pages * tokens_per_page
+        n = TOKEN_SLOTS_PER_BOOK
         w = len(self.words)
-        p = len(self.punctuation)
+        p = len(SHARED_PUNCTUATION)
         return log10_no_adjacent_punct(n, w, p)
 
     def generate_token(self, seed: str, position: int) -> str:
         """Generate token ignoring adjacency — for raw use only."""
-        vocab = self.words + self.punctuation
+        if not self.words:
+            raise ValueError("punctuation-constrained requires non-empty words vocabulary")
+        vocab = self.words + SHARED_PUNCTUATION
         idx = deterministic_index(seed, self.mode_id, position, len(vocab))
         return vocab[idx]
 
@@ -24,8 +56,8 @@ class PunctuationConstrainedGenerator(LibraryGenerator):
         self, seed: str, position: int, prev_is_punct: bool
     ) -> str:
         """Generate token respecting no-adjacent-punctuation rule."""
-        punct_set = set(self.punctuation)
-        vocab = self.words + self.punctuation
+        punct_set = set(SHARED_PUNCTUATION)
+        vocab = self.words + SHARED_PUNCTUATION
         candidate_idx = deterministic_index(seed, self.mode_id, position, len(vocab))
         candidate = vocab[candidate_idx]
         if prev_is_punct and candidate in punct_set:
