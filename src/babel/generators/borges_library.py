@@ -11,7 +11,25 @@ from babel.utils.hashing import deterministic_index
 
 
 class BorgesLibraryGenerator(LibraryGenerator):
-    """Stage 0 normalized English character baseline with Borges geometry."""
+    """
+    Stage 0 generator for the article's English-Language Borges Baseline.
+
+    Theoretical basis:
+      - docs/article/md.github/Semantic_Models_of_Library_of_Babel.github.md
+      - Stage 0 "English-Language Borges Baseline"
+    Formula:
+      - 31^1,312,000
+      - log10 size = CHARS_PER_BOOK * log10(31)
+    Data requirements:
+      - none (character-level model; vocabulary files are not used)
+    Implementation level:
+      - canonical
+    Example:
+      - uv run library-of-babel page --mode borges-library --seed test --page 0
+    Tests:
+      - tests/generators/test_borges_library.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "borges-library"
     metadata = ModelMetadata(

@@ -12,6 +12,21 @@ from babel.config import DEFAULT_MANIFEST
 
 
 class InstalledVocabulary(BaseModel):
+    """
+    Installed vocabulary manifest entry.
+
+    Purpose:
+      - persist local installation metadata (source, path, checksum, counts)
+    Inputs:
+      - produced by `install_source()` in `babel.vocabulary.installer`
+    Example:
+      - stored in `vocabulary_manifest.json`
+    Failure modes:
+      - invalid data/paths are surfaced during manifest load/validation
+    Stage relation:
+      - tracks data sources consumed by Stage 1–6 models
+    """
+
     source_id: str
     vocabulary_id: str
     path: Path
@@ -23,6 +38,13 @@ class InstalledVocabulary(BaseModel):
 
 
 class VocabularyManifest(BaseModel):
+    """
+    Collection model for installed vocabulary entries.
+
+    Purpose:
+      - represent the on-disk manifest storing install state for known sources
+    """
+
     version: int = 1
     base_dir: Path
     installed: list[InstalledVocabulary] = []

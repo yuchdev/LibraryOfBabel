@@ -8,7 +8,24 @@ from babel.utils.hashing import deterministic_index
 
 
 class WordBasedGenerator(LibraryGenerator):
-    """Stage 1 lexical model: `(W+P)^N` with shared punctuation and deterministic indexing."""
+    """
+    Stage 1 Lexical Reduction Model from the article chain.
+
+    Theoretical basis:
+      - Stage 1 "Lexical Reduction Model"
+    Formula:
+      - (W + P)^N, with N = TOKEN_SLOTS_PER_BOOK and P = 4 shared punctuation tokens
+    Data requirements:
+      - words.txt vocabulary
+      - shared punctuation `. ? , !`
+    Implementation level:
+      - canonical
+    Example:
+      - uv run library-of-babel metrics --mode word-based
+    Tests:
+      - tests/test_word_based.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "word-based"
     metadata = ModelMetadata(

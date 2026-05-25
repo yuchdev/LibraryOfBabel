@@ -19,7 +19,27 @@ DEFAULT_TEMPLATE = ["DET", "ADJ", "NOUN", "VERB", "DET", "NOUN", "PUNCT"]
 
 
 class GrammarConstrainedGenerator(LibraryGenerator):
-    """Stage 4 categorical grammar template model with optional POS-file loading support."""
+    """
+    Stage 4 Categorical Grammar Constraint generator.
+
+    Theoretical basis:
+      - Stage 4 "Categorical Context-Free Grammar Constraint"
+    Formula:
+      - (D·A·N·V·D·N·P)^R using default template
+      - R = floor(N / len(template))
+    Data requirements:
+      - optional POS files (WordNet style): nouns.txt, verbs.txt, adjectives.txt
+      - deterministic built-in fallback POS lists
+      - shared punctuation `. ? , !` for PUNCT category
+    Implementation level:
+      - lightweight (canonical template with local fallback vocab)
+    Example:
+      - uv run library-of-babel page --mode grammar-constrained --seed test --page 0
+    Tests:
+      - tests/generators/test_grammar_constrained.py
+      - tests/vocabulary/test_vocab_loading.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "grammar-constrained"
     metadata = ModelMetadata(

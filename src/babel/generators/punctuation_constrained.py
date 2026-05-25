@@ -7,7 +7,25 @@ from babel.utils.hashing import deterministic_index
 
 
 class PunctuationConstrainedGenerator(LibraryGenerator):
-    """Stage 2 punctuation adjacency constraint using log-space combinatorics."""
+    """
+    Stage 2 Syntactic Reduction Model with punctuation adjacency constraints.
+
+    Theoretical basis:
+      - Stage 2 "Syntactic Reduction Model (Punctuation Constraint)"
+    Formula:
+      - Σ binom(N-k+1,k) P^k W^(N-k), k=0..floor((N+1)/2)
+    Data requirements:
+      - words.txt vocabulary
+      - shared punctuation `. ? , !`
+    Implementation level:
+      - canonical
+    Example:
+      - uv run library-of-babel page --mode punctuation-constrained --seed test --page 0
+    Tests:
+      - tests/test_punctuation_constrained.py
+      - tests/mathlib/test_combinatorics.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "punctuation-constrained"
     metadata = ModelMetadata(

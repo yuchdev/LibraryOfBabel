@@ -5,7 +5,24 @@ from pydantic import BaseModel
 
 
 class VocabularySource(BaseModel):
-    """Vocabulary source registry entry used by setup-vocab and stage-aware docs."""
+    """
+    Registry record for a vocabulary source used by runtime/setup commands.
+
+    Purpose:
+      - declares source identity, expected files, optional download URL, and stage suitability
+    Expected input files:
+      - source-specific files listed in `expected_files` (for example `words.txt`,
+        and for WordNet-style sources also POS files)
+    Example:
+      - `KNOWN_VOCABULARY_SOURCES["wordnet"]`
+    Failure modes:
+      - unknown source IDs are rejected by installer functions
+      - sources without `download_url` cannot be auto-installed
+    Stage relation:
+      - Stage 1–3 lexical vocab sources
+      - Stage 4 POS-aware grammar data
+      - Stage 5 semantic-friendly source metadata
+    """
 
     source_id: str
     display_name: str

@@ -9,6 +9,14 @@ from babel.rendering.page_renderer import render_tokens
 
 
 class BookConfig(BaseModel):
+    """
+    Runtime configuration for deterministic page generation.
+
+    Notes:
+      - `tokens_per_page` is a preview/rendering control for CLI/API page output.
+      - Theoretical model sizes are computed from stage constants, not preview size.
+    """
+
     mode_id: str
     seed: str
     pages: int = 410
@@ -18,6 +26,8 @@ class BookConfig(BaseModel):
 
 
 class GeneratedPage(BaseModel):
+    """Generated page payload containing token stream and rendered text."""
+
     book_config: BookConfig
     page_index: int
     tokens: list[str]
@@ -25,6 +35,15 @@ class GeneratedPage(BaseModel):
 
 
 class LibraryGenerator(ABC):
+    """
+    Base interface for all Stage 0–6 generators in the article-aligned chain.
+
+    Subclasses provide:
+      - metadata (stage name, formula, implementation level)
+      - log10_size() for theoretical size calculations
+      - generate_token()/generate_page() for deterministic local preview generation
+    """
+
     mode_id: str
     metadata: ModelMetadata
 

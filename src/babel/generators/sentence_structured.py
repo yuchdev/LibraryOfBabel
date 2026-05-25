@@ -17,7 +17,24 @@ SENTENCE_END_PUNCTUATION = SHARED_PUNCTUATION
 
 
 class SentenceStructuredGenerator(LibraryGenerator):
-    """Stage 3 fixed 16-slot sentence block: 15 words followed by one punctuation token."""
+    """
+    Stage 3 Sentence-Structured Uniformity Constraint generator.
+
+    Theoretical basis:
+      - Stage 3 "Sentence-Structured Uniformity Constraint"
+    Formula:
+      - W^(15S) P^S, where S=floor(N/16)
+    Data requirements:
+      - words.txt vocabulary
+      - shared punctuation `. ? , !` used as the 16th token in each block
+    Implementation level:
+      - canonical
+    Example:
+      - uv run library-of-babel metrics --mode sentence-structured
+    Tests:
+      - tests/test_sentence_structured.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "sentence-structured"
     metadata = ModelMetadata(

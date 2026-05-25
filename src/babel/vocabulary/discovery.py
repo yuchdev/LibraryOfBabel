@@ -41,6 +41,15 @@ def resolve_vocabulary_path(
     4. If *auto_download* is True, trigger installation of the preferred (or
        first known) source and return its path.
     5. Raise a :class: `VocabularyNotFoundError` with actionable instructions.
+
+    Purpose:
+      - keep runtime commands local-first by resolving already-installed data
+    Stage relation:
+      - provides vocabulary entry point for Stage 1–6 runtime commands
+    Example:
+      - `resolve_vocabulary_path(None, preferred_source="wordfreq_25k")`
+    Failure modes:
+      - raises `VocabularyNotFoundError` when no explicit/installed/auto-download source resolves
     """
     # 1. Explicit path wins
     if explicit_path is not None:
@@ -87,4 +96,4 @@ def _setup_hint() -> str:
 
 
 class VocabularyNotFoundError(FileNotFoundError):
-    """Raised when no vocabulary can be located."""
+    """Raised when no usable vocabulary file can be resolved for runtime commands."""

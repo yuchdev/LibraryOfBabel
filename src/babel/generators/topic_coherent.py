@@ -27,7 +27,25 @@ TOPIC_WORDSETS: dict[str, list[str]] = {
 
 
 class TopicCoherentGenerator(LibraryGenerator):
-    """Stage 6 lightweight topic-constrained vocabulary model."""
+    """
+    Stage 6 Topic-Coherent Manifold approximation via explicit topic sets.
+
+    Theoretical basis:
+      - Stage 6 "Topic-Coherent Manifolds / Topic-Constrained Vocabulary Model"
+    Formula:
+      - Σ_topic (|V_topic| + P)^N
+    Data requirements:
+      - words.txt vocabulary
+      - explicit local topic wordsets
+      - shared punctuation `. ? , !`
+    Implementation level:
+      - lightweight (local deterministic topic sets; no embedding manifold model)
+    Example:
+      - uv run library-of-babel page --mode topic-coherent --seed test --page 0
+    Tests:
+      - tests/generators/test_topic_coherent.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "topic-coherent"
     metadata = ModelMetadata(

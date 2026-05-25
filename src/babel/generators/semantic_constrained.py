@@ -10,7 +10,25 @@ from babel.utils.hashing import deterministic_index
 
 
 class SemanticConstrainedGenerator(LibraryGenerator):
-    """Stage 5 lightweight semantic adjacency graph with deterministic transitions."""
+    """
+    Stage 5 Markovian Semantic Adjacency Constraint (lightweight local graph).
+
+    Theoretical basis:
+      - Stage 5 "Markovian Semantic Adjacency Constraint"
+      - asymptotic count approximation ≈ λ_max^N
+    Formula:
+      - log10 size = TOKEN_SLOTS_PER_BOOK * log10(lambda_max)
+    Data requirements:
+      - words.txt vocabulary
+      - shared punctuation `. ? , !` as graph nodes
+    Implementation level:
+      - lightweight (explicit deterministic graph and power-iteration estimate)
+    Example:
+      - uv run library-of-babel metrics --mode semantic-constrained
+    Tests:
+      - tests/generators/test_semantic_constrained.py
+      - tests/test_determinism.py
+    """
 
     mode_id = "semantic-constrained"
     NEIGHBOR_OFFSET_A = 7
