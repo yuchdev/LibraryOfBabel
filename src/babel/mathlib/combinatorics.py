@@ -8,7 +8,7 @@ def log10_no_adjacent_punct(n: int, w: int, p: int) -> float:
     log10 of the number of sequences of length N from (W words + P punctuation)
     where no two punctuation tokens are adjacent.
 
-    Formula: sum over k=0..floor(N/2): C(N-k+1, k) * P^k * W^(N-k)
+    Formula: sum over k=0..floor((N+1)/2): C(N-k+1, k) * P^k * W^(N-k)
 
     Uses log-space summation.
     """
