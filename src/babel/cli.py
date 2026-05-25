@@ -141,7 +141,7 @@ def cmd_info() -> None:
         ("word-based", "Each token can be any word or punctuation independently."),
         ("punctuation-constrained", "No two punctuation tokens appear consecutively."),
         ("sentence-structured", "Fixed-length sentences (15 words + end punct)."),
-        ("grammar-constrained", "Tokens follow a POS template."),
+        ("grammar-constrained", "Tokens follow a fixed cyclic grammar template."),
         ("semantic-constrained", "Tokens are connected via semantic clusters."),
         ("topic-coherent", "Each book is restricted to a thematic manifold."),
     ]

@@ -184,13 +184,13 @@ uv run library-of-babel vocab-info
 uv run library-of-babel vocab-info --vocab data/vocabulary/demo.txt
 
 # Metrics for a specific mode (uses installed vocabulary)
-uv run library-of-babel metrics --mode unrestricted-words
+uv run library-of-babel metrics --mode word-based
 
 # Or with an explicit vocab file
-uv run library-of-babel metrics --mode unrestricted-words --vocab data/vocabulary/demo.txt
+uv run library-of-babel metrics --mode word-based --vocab data/vocabulary/demo.txt
 
 # Generate page 3 of a deterministic book (uses installed vocabulary)
-uv run library-of-babel page --mode fixed-sentence --seed "my-book" --page 3
+uv run library-of-babel page --mode sentence-structured --seed "my-book" --page 3
 
 # Compare all modes (uses installed vocabulary)
 uv run library-of-babel compare
@@ -198,15 +198,18 @@ uv run library-of-babel compare
 
 ### Implemented Modes
 
-| Mode                      | Formula                      | Description                       |
-|---------------------------|------------------------------|-----------------------------------|
-| `unrestricted-words`      | (W+P)^N                      | Any token at any position         |
-| `no-adjacent-punctuation` | Σ C(N-k+1,k)·P^k·W^(N-k)     | No two punctuation marks in a row |
-| `fixed-sentence`          | W^(S·w)·P^S                  | Fixed-length sentences            |
-| `pos-template`            | Π(category_size)^repetitions | Follows POS pattern               |
+| Mode                      | Formula                      | Description                                        | Implementation Status |
+|---------------------------|------------------------------|----------------------------------------------------|-----------------------|
+| `borges-library`          | S^N                          | Character-based original model (English alphabet). | Implemented           |
+| `word-based`              | (W+P)^N                      | Each token can be any word or punctuation.         | Implemented           |
+| `punctuation-constrained` | Σ C(N-k+1,k)·P^k·W^(N-k)     | No two punctuation tokens appear consecutively.    | Implemented           |
+| `sentence-structured`     | W^(S·w)·P^S                  | Fixed-length sentences (15 words + end punct).     | Implemented           |
+| `grammar-constrained`     | Π(category_size)^repetitions | Tokens follow a fixed cyclic grammar template.     | Implemented (PoC)     |
+| `semantic-constrained`    | W · (W/K + P)^(N-1)          | Tokens are connected via semantic clusters.        | Implemented (PoC)     |
+| `topic-coherent`          | W · (T + P)^N                | Each book is restricted to a thematic manifold.    | Implemented           |
 
 ### Known Limitations
 
-- POS-template mode uses tiny built-in vocabulary
-- No-adjacent-punctuation `log10_size` uses log-space summation (maybe slow for a very large `N`)
+- `grammar-constrained` mode uses tiny built-in vocabulary by default
+- `punctuation-constrained` `log10_size` uses log-space summation (maybe slow for a very large `N`)
 - Full-book generation is intentionally unsupported
