@@ -64,18 +64,24 @@ To comprehend the scale of this integer, logarithmic conversion is employed to e
 ```math
 \log_{10}(25^{1,312,000}) = 1,312,000 \times \log_{10}(25) \approx 1,312,000 \times 1.3979 \approx 1,834,097
 ```
-Thus, the Library contains approximately $1.95 \times 10^{1,834,097}$ discrete books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) It is worth noting that contemporary digital implementations, such as the digital library created by Jonathan Basile, often expand this parameter slightly to include all 26 lowercase English letters along with the comma, period, and space, resulting in a 29-character alphabet and a slightly larger permutation space of $29^{1,312,000}$, which equates to approximately $10^{4677}$ possible 3,200-character pages.[<sup>2</sup>](https://en.wikipedia.org/wiki/The_Library_of_Babel)
+Thus, the Library contains approximately $1.95 \times 10^{1,834,097}$ discrete books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) It is worth noting that contemporary digital implementations, such as the digital library created by Jonathan Basile, often expand this parameter slightly to include all 26 lowercase English letters along with the comma, period, and space, resulting in a 29-character alphabet and a larger permutation space than Borges' original 25-symbol alphabet.[<sup>2</sup>](https://en.wikipedia.org/wiki/The_Library_of_Babel) For the present article, even this 29-symbol variant is not sufficient as a normalized comparison baseline, because the later English models also use the question mark and the exclamation mark. The normalized Stage 0 below therefore uses one shared 31-symbol English alphabet throughout the model chain.
 
 In this unmodified baseline model, the statistical probability of selecting a sequence of characters that form even a single coherent English sentence is vanishingly small. The structural randomness is entirely unbounded, maximizing the entropy of the system. To generate pages on the fly without storing them, a straightforward mapping between a 3,200-character page space (40 lines multiplied by 80 characters) and a unique numerical seed derived from the book's location is utilized.[<sup>11</sup>](https://www.quora.com/How-many-bytes-of-storage-would-the-Library-of-Babel-take-if-it-was-stored-in-a-digital-format) However, because the text lacks any organizational hierarchy or semantic clustering, this model serves primarily as a demonstration of mathematical infinity rather than a repository of accessible knowledge.
 
 ## Stage 0: The English-Language Borges Baseline
 
-The original Borges model is the historical combinatoric baseline, but it is not a fair numerical baseline for the later English-oriented reductions. Borges' alphabet has 25 symbols, usually described as 22 letters plus comma, period, and space; the later lexical, grammatical, and semantic stages operate over English vocabulary and English orthography. Therefore, before applying any semantic constraint, the model must be normalized into an English-language character model while preserving Borges' physical book geometry.
+The original Borges model is the historical combinatoric baseline, but it is not a fair numerical baseline for the later English-oriented reductions unless the alphabet is normalized first. Borges' alphabet has 25 symbols, usually described as 22 letters plus comma, period, and space; the later lexical, grammatical, and semantic stages operate over English vocabulary and the punctuation actually used in the generation models. Therefore, before applying any semantic constraint, the model must be converted into an English-language character model while preserving Borges' physical book geometry.
 
-Let the normalized English alphabet be:
+The critical rule for all further comparisons is that the alphabet remains exactly the same across all stages. The models may change the unit of generation—from characters to words, from words to grammatical categories, or from independent choices to graph-constrained transitions—but they must not silently add or remove punctuation. At token level, the common generation alphabet is exactly `word . ? , !`. The shared punctuation pool is exactly the four punctuation tokens `. ? , !`:
 
 ```math
-A_{\mathrm{en}} = 26\ \text{lowercase English letters} + \{\text{comma},\ \text{period},\ \text{space}\}, \qquad |A_{\mathrm{en}}| = 29.
+P = \{\mathtt{.},\ \mathtt{?},\ \mathtt{,},\ \mathtt{!}\}, \qquad |P| = 4.
+```
+
+Equivalently, all stages are normalized against the same English orthographic alphabet:
+
+```math
+A_{\mathrm{en}} = \{a, b, \ldots, z,\ \text{space},\ \mathtt{.},\ \mathtt{?},\ \mathtt{,},\ \mathtt{!}\}, \qquad |A_{\mathrm{en}}| = 31.
 ```
 
 The book still contains the same number of independent character slots:
@@ -84,19 +90,19 @@ The book still contains the same number of independent character slots:
 C = 410 \times 40 \times 80 = 1,312,000.
 ```
 
-However, each slot now ranges over 29 English orthographic symbols rather than 25 Borges symbols. The normalized Stage 0 state space is therefore:
+However, each slot now ranges over 31 English orthographic symbols rather than 25 Borges symbols. The normalized Stage 0 state space is therefore:
 
 ```math
-\text{Total English Baseline Books}=29^{1,312,000}.
+\text{Total English Baseline Books}=31^{1,312,000}.
 ```
 
 In base-10 scale:
 
 ```math
-\log_{10}(29^{1,312,000}) = 1,312,000 \times \log_{10}(29) \approx 1,918,666.
+\log_{10}(31^{1,312,000}) = 1,312,000 \times \log_{10}(31) \approx 1,956,667.
 ```
 
-Thus, Stage 0 contains approximately $10^{1,918,666}$ possible books. This normalization actually expands the original Borges space by a factor of $(29/25)^{1,312,000}$, but it removes a category error from the rest of the article: every later reduction is now measured against an English-language unconstrained model, not against a Spanish-like or language-ambiguous symbolic alphabet. Stage 1 and all subsequent stages can therefore be interpreted as reductions of English textual entropy rather than as simultaneous changes of both language and model class.
+Thus, Stage 0 contains approximately $10^{1,956,667}$ possible books. This normalization expands the original Borges space by a factor of $(31/25)^{1,312,000}$, but it removes a category error from the rest of the article: every later reduction is now measured against the same English-language symbol inventory, not against a changing alphabet. Stage 1 and all subsequent stages can therefore be interpreted as reductions of English textual entropy rather than as simultaneous changes of both language and model class.
 
 ## Stage 1: The Lexical Reduction Model
 
@@ -104,7 +110,7 @@ The foundational step in introducing discernible meaning to a random generation 
 
 ### Mathematical Formulation of Lexical Entropy
 
-Let us define a comprehensive vocabulary pool, denoted as $W$, consisting of $100,000$ unique English words, and an auxiliary punctuation pool, denoted as $P$, consisting of $6$ distinct orthographic symbols (such as the period, comma, question mark, exclamation mark, colon, and semicolon).[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) In order to map this tokenized approach back to the physical constraints of the Borges volume, we must estimate the average length of a token. Assuming an average word and punctuation width of approximately 6 characters—which accounts for the physical letters and the requisite trailing space character separating the tokens—the total number of available token slots $N$ per 410-page book is substantially reduced:
+Let us define a comprehensive vocabulary pool, denoted as $W$, consisting of $100,000$ unique English words, and an auxiliary punctuation pool, denoted as $P$, consisting of exactly $4$ orthographic symbols: period, question mark, comma, and exclamation mark.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) In order to map this tokenized approach back to the physical constraints of the Borges volume, we must estimate the average length of a token. Assuming an average word and punctuation width of approximately 6 characters—which accounts for the physical letters and the requisite trailing space character separating the tokens—the total number of available token slots $N$ per 410-page book is substantially reduced:
 
 ```math
 N \approx \frac{1,312,000\ \text{total characters}}{6\ \text{characters per token}} \approx 218,667\ \text{tokens}
@@ -114,18 +120,18 @@ N \approx \frac{1,312,000\ \text{total characters}}{6\ \text{characters per toke
 Under this lexical constraint, the new combinatoric state space of the library is no longer calculated by character permutations, but by vocabulary permutations. The total number of unique books is defined by:
 
 ```math
-\text{Total Lexical Books}=(W+P)^N=(100,000+6)^{218,667}=(100,006)^{218,667}
+\text{Total Lexical Books}=(W+P)^N=(100,000+4)^{218,667}=(100,004)^{218,667}
 ```
 [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
 To find the base-10 representation of this restricted library space:
 
 ```math
-218,667 \times \log_{10}(100,006) \approx 218,667 \times 5.000026 \approx 1,093,340
+218,667 \times \log_{10}(100,004) \approx 218,667 \times 5.000017 \approx 1,093,339
 ```
 [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
-This calculation reveals a total volume of approximately $10^{1,093,340}$ unique books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) While this integer remains incomprehensibly massive, it represents a staggering reduction of the library's size by over 825,000 orders of magnitude compared to the normalized Stage 0 English-language baseline. Although the generated pages will read as nonsensical "word salad," every individual unit is linguistically recognizable.
+This calculation reveals a total volume of approximately $10^{1,093,339}$ unique books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) While this integer remains incomprehensibly massive, it represents a staggering reduction of the library's size by over 863,000 orders of magnitude compared to the normalized Stage 0 English baseline. Although the generated pages will read as nonsensical "word salad," every individual unit is linguistically recognizable.
 
 ### Algorithmic Implementation of Lexical Constraints
 
@@ -137,7 +143,7 @@ import hashlib
 # A representative sample vocabulary for demonstration purposes.
 # In a full implementation, this array would contain 100,000 unique terms.
 VOCABULARY_POOL = ["the", "house", "river", "memory", "darkness", "light", "runs", "slowly", "through", "time"]
-PUNCTUATION_POOL = [".", ",", ";", ":", "?", "!"]
+PUNCTUATION_POOL = [".", "?", ",", "!"]
 COMBINED_LEXICAL_POOL = VOCABULARY_POOL + PUNCTUATION_POOL
 
 
@@ -259,11 +265,11 @@ def generate_syntactic_page(seed_coordinate: str, page_number: int, tokens_per_p
 
 ## Stage 3: The Sentence-Structured Uniformity Constraint
 
-Despite the prevention of punctuation clustering, the pacing of the syntactic model remains highly erratic. Natural human language is bounded by periodic constraints and specific structural rhythms. By forcing the generative algorithm to adhere to a rigid sentence template—for instance, a decree that every sentence must contain exactly 15 sequential words followed immediately by exactly one terminal punctuation mark—the output begins to visually and rhythmically exhibit the characteristics of distinct textual clauses.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
+Despite the prevention of punctuation clustering, the pacing of the syntactic model remains highly erratic. Natural human language is bounded by periodic constraints and specific structural rhythms. By forcing the generative algorithm to adhere to a rigid sentence template—for instance, a decree that every sentence-like block must contain exactly 15 sequential words followed immediately by exactly one punctuation mark from the shared punctuation pool—the output begins to visually and rhythmically exhibit the characteristics of distinct textual clauses.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
 ### Mathematical Formulation of Periodic Pacing
 
-Under the strict periodic template represented as W W W W W W W W W W W W W W W P (where W is a word and P is a terminal punctuation mark), each individual "sentence block" consumes exactly 16 token slots. The total number of uniform sentences per book, denoted as $S$, is strictly defined by dividing the total token capacity by the block size:
+Under the strict periodic template represented as W W W W W W W W W W W W W W W P (where W is a word and P is one symbol from the shared punctuation pool $P=\{\mathtt{.}, \mathtt{?}, \mathtt{,}, \mathtt{!}\}$), each individual sentence-like block consumes exactly 16 token slots. The total number of uniform sentences per book, denoted as $S$, is strictly defined by dividing the total token capacity by the block size:
 
 ```math
 S = \left\lfloor \frac{N}{16} \right\rfloor
@@ -273,15 +279,15 @@ S = \left\lfloor \frac{N}{16} \right\rfloor
 Given the baseline parameter of $N \approx 218,667$ tokens, the total sentence count per book is $S \approx 13,666$. The total volume of the library under this highly rigid periodic constraint drops precipitously to a simple exponentiation model:
 
 ```math
-\text{Total Sentence Books}=W^{15S}P^S \approx (100,000)^{204,990} \times (6)^{13,666}
+\text{Total Sentence Books}=W^{15S}P^S \approx (100,000)^{204,990} \times (4)^{13,666}
 ```
 [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) 
 
-This mathematical operation yields an order of magnitude of roughly $10^{1,035,639}$ possible books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) The total combinatoric volume of this space is significantly smaller than the previous models, yet every randomly generated text perfectly obeys block-level prose pacing, visually resembling a structured novel despite lacking internal meaning.
+This mathematical operation yields an order of magnitude of roughly $10^{1,033,178}$ possible books.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) The total combinatoric volume of this space is significantly smaller than the previous models, yet every randomly generated text perfectly obeys block-level prose pacing, visually resembling a structured novel despite lacking internal meaning. The comma is intentionally retained in the block-closing pool so that Stage 3 uses the same punctuation alphabet as every other stage; it can be interpreted as a clause boundary rather than a sentence terminator.
 
 ```python
 WORDS_PER_SENTENCE_LIMIT = 15
-TERMINAL_PUNCTUATION_POOL = [".", "?", "!"]
+BLOCK_PUNCTUATION_POOL = [".", "?", ",", "!"]
 
 
 def generate_structured_sentence(seed_coordinate: str, sentence_index: int) -> str:
@@ -298,15 +304,15 @@ def generate_structured_sentence(seed_coordinate: str, sentence_index: int) -> s
         selected_word = VOCABULARY_POOL[word_prng_val % len(VOCABULARY_POOL)]
         sentence_words.append(selected_word)
 
-    # 2. Generate exactly 1 terminal punctuation mark to close the block
+    # 2. Generate exactly 1 punctuation mark from the shared punctuation pool to close the block
     encoded_punct_data = f"{seed_coordinate}:sentence_block:{sentence_index}:terminal_punct".encode("utf-8")
     punct_prng_val = int.from_bytes(hashlib.sha256(encoded_punct_data).digest()[:8], "big")
-    terminal_punctuation = TERMINAL_PUNCTUATION_POOL[
-        punct_prng_val % len(TERMINAL_PUNCTUATION_POOL)
+    block_punctuation = BLOCK_PUNCTUATION_POOL[
+        punct_prng_val % len(BLOCK_PUNCTUATION_POOL)
     ]
 
     # Concatenate the words and append the punctuation directly to the final word
-    return " ".join(sentence_words) + terminal_punctuation
+    return " ".join(sentence_words) + block_punctuation
 ```
 
 ## Stage 4: The Categorical Context-Free Grammar Constraint
@@ -321,7 +327,7 @@ If we enforce a single, strict syntactic sequence template for every sentence in
 
 [Adjective][Noun][Verb][Noun]
 
-The combinatorial space for generating a single valid sentence under this template is the Cartesian product of the specific subset sizes:
+Here $P$ is still the same four-symbol punctuation pool $\{\mathtt{.}, \mathtt{?}, \mathtt{,}, \mathtt{!}\}$ defined in Stage 0. The combinatorial space for generating a single valid sentence under this template is the Cartesian product of the specific subset sizes:
 
 ```math
 |D| \times |A| \times |N| \times |V| \times |D| \times |N| \times |P|
@@ -385,7 +391,7 @@ The number of valid texts of length $N$ that can be generated is dictated by the
 
 | **Progressive Model Stage** | **Combinatorial Constraint Mechanism** | **Asymptotic Entropy / Volume Bounds**                                                                 | **Resulting Output Quality**             |
 |-----------------------------|----------------------------------------|--------------------------------------------------------------------------------------------------------|------------------------------------------|
-| **0. English-Language Borges** | English character permutation          | $29^{1,312,000}$  | Perfect uniform English-symbol noise [<sup>2</sup>](https://en.wikipedia.org/wiki/The_Library_of_Babel) |
+| **0. English-Language Borges** | English character permutation          | $31^{1,312,000}$  | Perfect uniform English-symbol noise [<sup>2</sup>](https://en.wikipedia.org/wiki/The_Library_of_Babel) |
 | **1. Lexical Reduction**    | Pre-defined Vocabulary Arrays          | $(W+P)^N$  | Nonsense Word Salad [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)         |
 | **2. Syntactic Reduction**  | Adjacency Bounds (Punctuation)         | $\sum_{k=0}^{\lfloor (N+1)/2 \rfloor}\binom{N-k+1}{k}P^kW^{N-k}$ | Paced Word Salad [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)            |
 | **3. Sentence Structure**   | Uniform Token Length Limits            | $W^{15S}P^S$ | Fragmented Clauses [<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)          |
@@ -456,8 +462,8 @@ class DigitalLibraryOfBabel:
         Initializes the Library engine with a specific mathematical constraint tier.
         """
         self.constraint_model = constraint_model
-        # The expanded 29-character set utilized in modern digital implementations
-        self.character_set = "abcdefghijklmnopqrstuvwxyz,. "
+        # The normalized 31-character English alphabet used by all stages
+        self.character_set = "abcdefghijklmnopqrstuvwxyz .?,!"
 
     def _construct_seed(self, hexagon: str, wall: int, shelf: int, volume: int, page: int) -> str:
         """Constructs the unique master identifier string for the requested coordinate."""
@@ -576,7 +582,7 @@ By mapping the discrete space of text to a continuous latent distribution using 
 
 The progressive computational reduction of Borges' Library of Babel mathematically represents the profound information-theoretic journey from maximum thermodynamic entropy to deeply compressed semantic meaning.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 
-In its unconstrained, normalized Stage 0 theoretical state, the English-language library contains an incomprehensible $29^{1,312,000}$ possible states, preserving Borges' book geometry while aligning the alphabet with English orthography. Because every sequential configuration of characters is deemed equally likely by the system, the mutual information $I(\text{text};\text{meaning})$ is effectively zero. Attempting to locate a semantically valid page within this unbounded combinatoric space is functionally identical to the Infinite Monkey Theorem—a scenario heavily governed by probabilistic limits requiring spans of computational time orders of magnitude longer than the age of the universe.[<sup>3</sup>](https://hum11c.omeka.fas.harvard.edu/exhibits/show/open-readings/the-library-of-babel-and-infin)
+In its unconstrained, normalized Stage 0 theoretical state, the English-language library contains an incomprehensible $31^{1,312,000}$ possible states, preserving Borges' book geometry while aligning the alphabet with the exact English orthographic inventory used by every later model: lowercase letters, space, period, question mark, comma, and exclamation mark. Because every sequential configuration of characters is deemed equally likely by the system, the mutual information $I(\text{text};\text{meaning})$ is effectively zero. Attempting to locate a semantically valid page within this unbounded combinatoric space is functionally identical to the Infinite Monkey Theorem—a scenario heavily governed by probabilistic limits requiring spans of computational time orders of magnitude longer than the age of the universe.[<sup>3</sup>](https://hum11c.omeka.fas.harvard.edu/exhibits/show/open-readings/the-library-of-babel-and-infin)
 
 However, as each consecutive mathematical model is dynamically overlaid—progressing from Lexical vocabulary boundaries and Syntactic spacing rules to Context-Free Grammatical matrices and ultimately Markovian Semantic Graphs—the exponent denoting the size of the state space shrinks exponentially.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md) By mapping fixed token blocks instead of isolated characters, generating constraints via transition matrix eigenvalues, and eventually tethering the probabilistic outputs to the immense contextual weights of Large Language Models via deterministic Arithmetic Coding, the Library successfully transitions from a physical universe of static noise into a synthesized engine of human thought.[<sup>8</sup>](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md)
 

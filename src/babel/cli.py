@@ -142,8 +142,8 @@ def cmd_info() -> None:
         ("punctuation-constrained", "No two punctuation tokens appear consecutively."),
         ("sentence-structured", "Fixed-length sentences (15 words + end punct)."),
         ("grammar-constrained", "Tokens follow a fixed cyclic grammar template."),
-        ("semantic-constrained", "Tokens are connected via semantic clusters."),
-        ("topic-coherent", "Each book is restricted to a thematic manifold."),
+        ("semantic-constrained", "Tokens are connected via mock semantic clusters (hash-based PoC)."),
+        ("topic-coherent", "Each book is restricted to a deterministic vocabulary subset (PoC)."),
     ]
     for mode_id, desc in modes:
         console.print(f"  [cyan]{mode_id}[/cyan]  — {desc}")

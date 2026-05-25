@@ -205,11 +205,12 @@ uv run library-of-babel compare
 | `punctuation-constrained` | Σ C(N-k+1,k)·P^k·W^(N-k)     | No two punctuation tokens appear consecutively.    | Implemented           |
 | `sentence-structured`     | W^(S·w)·P^S                  | Fixed-length sentences (15 words + end punct).     | Implemented           |
 | `grammar-constrained`     | Π(category_size)^repetitions | Tokens follow a fixed cyclic grammar template.     | Implemented (PoC)     |
-| `semantic-constrained`    | W · (W/K + P)^(N-1)          | Tokens are connected via semantic clusters.        | Implemented (PoC)     |
-| `topic-coherent`          | W · (T + P)^N                | Each book is restricted to a thematic manifold.    | Implemented           |
+| `semantic-constrained`    | W · (W/K + P)^(N-1)          | Connected via mock semantic clusters (hash-based). | Implemented (PoC)     |
+| `topic-coherent`          | W · (T + P)^N                | Restricted to a deterministic vocabulary subset.   | Implemented (PoC)     |
 
 ### Known Limitations
 
 - `grammar-constrained` mode uses tiny built-in vocabulary by default
+- `semantic-constrained` and `topic-coherent` use hash-based simulated data (mock clusters/subsets)
 - `punctuation-constrained` `log10_size` uses log-space summation (maybe slow for a very large `N`)
 - Full-book generation is intentionally unsupported
