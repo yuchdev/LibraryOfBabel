@@ -37,7 +37,7 @@ from babel.vocabulary.normalizer import normalize_words
 
 app = typer.Typer(
     name="library-of-babel",
-    help="Local Python PoC for Progressive Library of Babel Reduction.",
+    help="Local Python application for Library of Babel Progressive Semantic Reduction",
     add_completion=False,
 )
 console = Console()
@@ -119,7 +119,7 @@ _patch_typer_help()
 @app.command("info")
 def cmd_info() -> None:
     """Print Borges base size, universe constants, and available modes."""
-    console.rule("[bold]Library of Babel — PoC Info[/bold]")
+    console.rule("[bold]Library of Babel Info[/bold]")
     m, e = scientific_from_log10(BORGES_LOG10_SIZE)
     console.print("\n[bold]Borges Original Library[/bold]")
     console.print(f"  Pages per book    : {BORGES_PAGES}")
@@ -142,8 +142,8 @@ def cmd_info() -> None:
         ("punctuation-constrained", "No two punctuation tokens appear consecutively."),
         ("sentence-structured", "Fixed-length sentences (15 words + end punct)."),
         ("grammar-constrained", "Tokens follow a fixed cyclic grammar template."),
-        ("semantic-constrained", "Tokens are connected via mock semantic clusters (hash-based PoC)."),
-        ("topic-coherent", "Each book is restricted to a deterministic vocabulary subset (PoC)."),
+        ("semantic-constrained", "Tokens are connected via mock semantic clusters (hash-based, stub)."),
+        ("topic-coherent", "Each book is restricted to a deterministic vocabulary subset (stub)."),
     ]
     for mode_id, desc in modes:
         console.print(f"  [cyan]{mode_id}[/cyan]  — {desc}")

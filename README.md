@@ -1,6 +1,6 @@
-# LibraryOfBabel
+# Library Of Babel
 
-This repository currently contains a local-first Python proof of concept for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
+This repository currently contains a local-first Python application for exploring progressively more constrained variants of Borges' Library of Babel, that models increasingly more meaningful variants of the Library.
 
 ## Development Setup
 
@@ -127,7 +127,7 @@ uv run pytest -q
 
 The Library of Babel contains every possible book of 410 pages, each page having 40 lines of 80 characters from a 25-character alphabet. Its size is approximately 10^1,834,097.
 
-This PoC models the library using word tokens instead of characters, exploring how different grammatical constraints affect the library's size.
+This application models the library using word tokens instead of characters, exploring how different grammatical constraints affect the library's size.
 
 See the detailed model description in [docs/Semantic_Models_of_Library_of_Babel_teaser.md](docs/article/md/Semantic_Models_of_Library_of_Babel_teaser.md).
 

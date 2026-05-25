@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "library-of-babel"
 version = "0.1.0"
-description = "Local Python PoC for Progressive Library of Babel Reduction"
+description = "Local Python application for Library of Babel Progressive Semantic Reduction"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

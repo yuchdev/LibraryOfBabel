@@ -1,14 +1,17 @@
-# AGENTS.md — Coding Rules for Library of Babel PoC
+# AGENTS.md — Coding Rules for Library of Babel
 
 ## Core Rules
 
 ### 1. Local-Only Execution
+
 Never make HTTP requests during normal execution. All vocabulary, computation, and generation must work offline.
 
 ### 2. No Full-Book Generation
+
 Never generate all pages of a book in memory. Only generate the requested page. A book config is just metadata (seed, mode, page count).
 
 ### 3. Deterministic Generation
+
 Use `deterministic_uint64(seed, namespace, position)` from `babel.utils.hashing`. Never use Python's `hash()` (randomized between processes) or `random.seed()` for deterministic output.
 
 ### 4. Log-Space Math

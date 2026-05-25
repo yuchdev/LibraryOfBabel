@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>From Borges to Meaning: The Library of Babel</title>
+    <title>The Library of Babel: Unified Semantic Models</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Chosen Palette: Warm Neutrals (Stone/Amber) for an academic, archival feel. -->
+    <!-- Chosen Palette: Monochrome & Slate with Indigo Accents (Academic/Data Science feel) -->
     <!-- Application Structure Plan: 
-         1. Hero/Abstract: Introduces the core concept and sets the academic tone.
-         2. Theory & Models (Interactive Article): A vertical layout stepping through the progressively restrictive models. Each model contains math, Python pseudo-code, and a live text preview to immediately visualize the "meaningfulness" of the constraint. This fulfills Task 1.
-         3. Combinatorial Collapse (Data Vis): A Chart.js visualization mapping the exponential decay of volume vs. the rise of semantic density, proving the mathematical thesis.
-         4. The Deterministic Simulator (Task 3): An interactive tool allowing users to fetch any page of any book deterministically using PRNG, without storing the book in memory.
-         5. Future Horizons (Task 2): A theoretical section proposing next-generation constraints (Latent Space, Causal Logic) and their mathematical requirements.
-         Why this structure? It smoothly transitions the user from theoretical understanding -> visual data proof -> hands-on practical implementation -> future theoretical projection.
+         1. Reconciliation Report (Analysis): Directly addresses the user's prompt to analyze discrepancies between theoretical texts and Python code, establishing the agreed-upon standards.
+         2. Interactive Model Explorer (Tabs): Details the 7 progressive stages (Stage 0 to Stage 6) with their reconciled formulas, Python structures, and live generation previews.
+         3. Combinatorial Collapse (Data Viz): Chart.js visualization comparing theoretical entropy vs. implemented volume.
+         4. Deterministic O(1) Simulator: Implements the memoryless generation algorithm using JS hashing to mirror the Python implementation.
+         5. Advanced Frontiers: Details the high-resource (LLM/Flows) models.
+         This structure ensures the discrepancy analysis is front-and-center, followed by hands-on exploration of the agreed-upon mechanics.
     -->
     <!-- Visualization & Content Choices: 
-         - Entropy vs. Meaning Chart -> Goal: Compare combinatorial volume to readability -> Viz: Dual-axis Line Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Clearest way to show inverse exponential relationships. Library: Chart.js.
-         - Deterministic Page Simulator -> Goal: Demonstrate on-the-fly generation -> Viz: Text area resembling a book page -> Interaction: Input fields for Seed and Page # -> Justification: Directly fulfills the prompt's requirement for a memory-less generator.
+         - Reconciliation Table -> Goal: Compare/Agree on models -> Viz: Styled HTML Table -> Interaction: Hover states -> Justification: Clearest format for mapping discrepancies to solutions.
+         - Progressive Models -> Goal: Detailed exploration -> Viz: Tabbed Interface -> Interaction: Click tabs to swap math/code/preview -> Justification: Prevents overwhelming scroll, groups related data.
+         - Entropy Chart -> Goal: Show exponential volume reduction -> Viz: Dual-axis Line Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Essential for understanding logarithmic scales.
+         - Page Simulator -> Goal: Demonstrate O(1) algorithm -> Viz: Interactive dashboard and "book page" output -> Interaction: Input fields, Model select, Generate button -> Justification: Directly implements the functional requirement of memoryless generation.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -27,15 +29,17 @@
             theme: {
                 extend: {
                     colors: {
-                        parchment: '#fdfbf7',
-                        ink: '#2c2825',
-                        accent: '#b45309', // Amber 700
-                        secondary: '#78716c', // Stone 500
+                        bgMain: '#f8fafc',
+                        textMain: '#0f172a',
+                        accent: '#4f46e5', // Indigo 600
+                        accentHover: '#4338ca', // Indigo 700
+                        surface: '#ffffff',
+                        borderSubtle: '#e2e8f0',
                     },
                     fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
                         serif: ['"Merriweather"', 'serif'],
                         mono: ['"Fira Code"', 'monospace'],
-                        sans: ['"Inter"', 'sans-serif'],
                     }
                 }
             }
@@ -43,634 +47,582 @@
     </script>
     <style>
         body {
-            background-color: #fdfbf7;
-            color: #2c2825;
+            background-color: #f8fafc;
+            color: #0f172a;
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-        h1, h2, h3, h4, h5, .serif {
-            font-family: 'Merriweather', serif;
-        }
-        .mono {
-            font-family: 'Fira Code', monospace;
-        }
+        h1, h2, h3, .serif { font-family: 'Merriweather', serif; }
+        .mono { font-family: 'Fira Code', monospace; }
         
         /* Mandatory Chart Container Styling */
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             margin-left: auto;
             margin-right: auto;
-            height: 50vh;
-            max-height: 450px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
+            height: 400px;
+            max-height: 500px;
         }
 
-        /* Custom Scrollbar for code blocks and text areas */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f5f5f4; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d6d3d1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a29e; 
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         .book-page {
-            background-color: #f5f5f4;
-            border: 1px solid #e7e5e4;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
-            padding: 2rem;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
             white-space: pre-wrap;
             overflow-y: auto;
-            height: 400px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            letter-spacing: 0.05em;
+            height: 350px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #334155;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active {
+            background-color: #e0e7ff;
+            border-left-color: #4f46e5;
+            color: #3730a3;
+            font-weight: 600;
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- Header & Abstract -->
-    <header class="max-w-4xl mx-auto pt-16 pb-12 px-6 border-b border-stone-200">
-        <div class="text-accent text-sm font-bold tracking-widest uppercase mb-4">Interactive Research Article</div>
-        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-ink leading-tight">From Borges to Meaning: <br>Progressive Reduction of the Library of Babel</h1>
-        
-        <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm mt-8">
-            <h2 class="text-xl font-bold mb-3 serif text-ink">Abstract</h2>
-            <p class="text-secondary mb-4">
-                This interactive document investigates a sequence of mathematical transformations of <i>The Library of Babel</i> originally proposed by Jorge Luis Borges. Starting from the classical combinatoric construction containing every possible sequence of characters, we progressively constrain the Library so that the number of possible books decreases, average semantic density increases, and random pages become increasingly human-readable.
-            </p>
-            <p class="text-secondary">
-                At each stage, we introduce a mathematical model, combinatoric analysis, and Python algorithms. The experiment reveals a phase transition from pure entropy toward structured language, and eventually toward semantic manifolds approximating meaningful literature.
+    <!-- Header -->
+    <header class="bg-surface border-b border-borderSubtle py-12 px-6 shadow-sm">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-accent font-bold tracking-wider uppercase text-xs mb-3">Reconciliation & Architecture Report</div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Computational Semantics:<br>Progressive Reduction of the Library of Babel</h1>
+            <p class="text-lg text-slate-600 max-w-3xl">
+                A unified algorithmic framework bridging theoretical combinatorial models with deterministic $O(1)$ Python implementations. This document reconciles nomenclature discrepancies, formalizes mathematical bounds, and provides memoryless generative engines.
             </p>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-12">
-        
-        <!-- Section 1: The Models -->
-        <section class="mb-20" id="models">
-            <div class="mb-10">
-                <h2 class="text-3xl font-bold serif mb-4">I. The Hierarchy of Constraints</h2>
-                <p class="text-lg text-secondary">
-                    This section details the mathematical models used to restrict the library. As we apply structural rules—moving from random characters to dictionary words, and then to semantic networks—the combinatorial explosion collapses, leaving a denser concentration of human-readable meaning.
+    <main class="max-w-6xl mx-auto px-6 py-12">
+
+        <!-- Section I: Discrepancy Analysis & Reconciliation -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold serif mb-6 border-b-2 border-slate-200 pb-2">I. Discrepancy Analysis & Unified Standard</h2>
+            <div class="bg-surface p-6 rounded-lg border border-borderSubtle shadow-sm mb-6">
+                <p class="mb-4 text-slate-700 leading-relaxed">
+                    <strong>Analysis of Sources:</strong> A thorough review of the provided articles and Python implementation files reveals several nomenclature and mathematical discrepancies. The teaser article utilizes theoretical bounds (e.g., Markov Eigenvalues $\lambda_{max}^N$ for semantics), while the Python code utilizes practical hash-cluster clustering $(W/K + P)^{N-1}$ to maintain deterministic $O(1)$ memory limitations. Furthermore, the baseline alphabet was misaligned across theoretical stages.
                 </p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Navigation / Tabs -->
-                <div class="lg:col-span-3 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0">
-                    <button onclick="showModel(1)" id="btn-model-1" class="model-tab-btn w-full text-left px-4 py-3 bg-stone-100 hover:bg-stone-200 border-l-4 border-accent font-semibold transition-colors rounded-r whitespace-nowrap lg:whitespace-normal">1. Pure Entropy</button>
-                    <button onclick="showModel(2)" id="btn-model-2" class="model-tab-btn w-full text-left px-4 py-3 hover:bg-stone-100 border-l-4 border-transparent font-semibold transition-colors rounded-r whitespace-nowrap lg:whitespace-normal">2. Lexical Restraint</button>
-                    <button onclick="showModel(3)" id="btn-model-3" class="model-tab-btn w-full text-left px-4 py-3 hover:bg-stone-100 border-l-4 border-transparent font-semibold transition-colors rounded-r whitespace-nowrap lg:whitespace-normal">3. Syntactic Markov</button>
-                    <button onclick="showModel(4)" id="btn-model-4" class="model-tab-btn w-full text-left px-4 py-3 hover:bg-stone-100 border-l-4 border-transparent font-semibold transition-colors rounded-r whitespace-nowrap lg:whitespace-normal">4. Semantic Graph</button>
-                </div>
-
-                <!-- Content Area -->
-                <div class="lg:col-span-9 bg-white border border-stone-200 shadow-sm rounded-lg p-6 lg:p-8 min-h-[600px]">
-                    
-                    <!-- Model 1 -->
-                    <div id="model-1" class="model-content">
-                        <h3 class="text-2xl font-bold serif mb-4">Model 1: The Original Borges Library</h3>
-                        <p class="mb-4">Borges defined books with exactly 410 pages, 40 lines per page, and 80 characters per line, utilizing an alphabet of 25 symbols (22 letters, space, comma, period).</p>
-                        
-                        <div class="bg-stone-50 p-4 rounded mb-6 border border-stone-200">
-                            <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Mathematical Model</h4>
-                            <p class="mb-2">Total character positions per book: <br> <code class="bg-white px-2 py-1 rounded border">C = 410 × 40 × 80 = 1,312,000</code></p>
-                            <p class="mb-2">Total combinatoric volume (Number of books): <br> <code class="bg-white px-2 py-1 rounded border">V<sub>1</sub> = 25<sup>1,312,000</sup> &approx; 1.95 × 10<sup>1,834,097</sup></code></p>
-                            <p class="text-sm text-secondary mt-2">This space maximizes Shannon Entropy: \( H_{max} = -\sum p(x) \log_2 p(x) \approx 4.64 \) bits per character.</p>
-                        </div>
-
-                        <div class="bg-slate-900 text-stone-300 p-4 rounded mb-6 overflow-x-auto mono text-sm">
-                            <div class="text-stone-500 mb-2"># Python Implementation</div>
-<pre><code>import random
-import string
-
-ALPHABET = string.ascii_lowercase[:22] + " ,."
-
-def generate_borges_page():
-    page = ""
-    for _ in range(40):
-        line = "".join(random.choices(ALPHABET, k=80))
-        page += line + "\n"
-    return page</code></pre>
-                        </div>
-                        
-                        <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Live Generation Preview</h4>
-                        <div class="book-page mono" id="preview-1">Generating pure entropy...</div>
-                    </div>
-
-                    <!-- Model 2 -->
-                    <div id="model-2" class="model-content hidden">
-                        <h3 class="text-2xl font-bold serif mb-4">Model 2: The Lexical Library</h3>
-                        <p class="mb-4">Human language is not arbitrary character sequences. By forcing the library to only select randomly from a dictionary of valid English words, we vastly reduce the combinatorial space while injecting recognizable micro-structures.</p>
-                        
-                        <div class="bg-stone-50 p-4 rounded mb-6 border border-stone-200">
-                            <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Mathematical Model</h4>
-                            <p class="mb-2">Assume an active vocabulary of <code>W = 50,000</code> words. Average word length is ~5 chars + 1 space.</p>
-                            <p class="mb-2">Words per book: <br> <code class="bg-white px-2 py-1 rounded border">N = 1,312,000 / 6 &approx; 218,666</code></p>
-                            <p class="mb-2">Total combinatoric volume: <br> <code class="bg-white px-2 py-1 rounded border">V<sub>2</sub> = 50,000<sup>218,666</sup> &approx; 10<sup>1,027,511</sup></code></p>
-                            <p class="text-sm text-secondary mt-2">Entropy decreases dramatically. Mutual information between adjacent characters increases, but semantic meaning remains near zero.</p>
-                        </div>
-
-                        <div class="bg-slate-900 text-stone-300 p-4 rounded mb-6 overflow-x-auto mono text-sm">
-                            <div class="text-stone-500 mb-2"># Python Implementation</div>
-<pre><code>import random
-
-VOCAB = ["time", "light", "shadow", "mirror", "labyrinth", "man", ...] # 50k words
-
-def generate_lexical_page():
-    page = ""
-    for _ in range(40):
-        words = random.choices(VOCAB, k=13) # ~13 words per 80 char line
-        page += " ".join(words) + "\n"
-    return page</code></pre>
-                        </div>
-                        
-                        <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Live Generation Preview</h4>
-                        <div class="book-page mono" id="preview-2">Generating lexical constraints...</div>
-                    </div>
-
-                    <!-- Model 3 -->
-                    <div id="model-3" class="model-content hidden">
-                        <h3 class="text-2xl font-bold serif mb-4">Model 3: Syntactic Markov Chains</h3>
-                        <p class="mb-4">To simulate grammar, we apply a First-Order Markov Chain based on a corpus. The probability of the next word depends solely on the current word, establishing local syntactic structure (e.g., nouns often follow adjectives).</p>
-                        
-                        <div class="bg-stone-50 p-4 rounded mb-6 border border-stone-200">
-                            <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Mathematical Model</h4>
-                            <p class="mb-2">Transition matrix <code>P</code> where <code>P<sub>ij</sub> = P(w<sub>j</sub> | w<sub>i</sub>)</code>.</p>
-                            <p class="mb-2">Because most word pairs are invalid in English grammar, the matrix is highly sparse. Average branching factor (valid next words) drops to <code>k &approx; 100</code>.</p>
-                            <p class="mb-2">Total combinatoric volume: <br> <code class="bg-white px-2 py-1 rounded border">V<sub>3</sub> = 100<sup>218,666</sup> &approx; 10<sup>437,332</sup></code></p>
-                            <p class="text-sm text-secondary mt-2">The text begins to resemble schizophrenic poetry. It possesses syntax but lacks long-range semantic coherence.</p>
-                        </div>
-
-                        <div class="bg-slate-900 text-stone-300 p-4 rounded mb-6 overflow-x-auto mono text-sm">
-                            <div class="text-stone-500 mb-2"># Python Implementation</div>
-<pre><code>import random
-
-# P_matrix is a dict mapping words to lists of likely following words
-P_MATRIX = { "the": ["man", "labyrinth", "mirror"], "man": ["walks", "sees", "is"] }
-
-def generate_markov_page(seed_word):
-    page, current_word = "", seed_word
-    for _ in range(40 * 13): # words per page
-        page += current_word + " "
-        current_word = random.choice(P_MATRIX.get(current_word, ["the"]))
-    return page</code></pre>
-                        </div>
-                        
-                        <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Live Generation Preview</h4>
-                        <div class="book-page mono" id="preview-3">Generating syntactic chains...</div>
-                    </div>
-
-                    <!-- Model 4 -->
-                    <div id="model-4" class="model-content hidden">
-                        <h3 class="text-2xl font-bold serif mb-4">Model 4: Semantic Graph Traversal</h3>
-                        <p class="mb-4">Entire books must remain inside a thematic manifold. We construct an ontological graph where nodes are concepts and edges are semantic relationships. A book is a random walk within a specific thematic cluster (e.g., "cosmology", "grief").</p>
-                        
-                        <div class="bg-stone-50 p-4 rounded mb-6 border border-stone-200">
-                            <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Mathematical Model</h4>
-                            <p class="mb-2">Graph <code>G = (V, E)</code> partitioned into thematic subgraphs <code>S<sub>1</sub>, S<sub>2</sub>...</code>.</p>
-                            <p class="mb-2">Branching factor inside a specific sub-topic is severely restricted: <code>k &approx; 15</code>.</p>
-                            <p class="mb-2">Total combinatoric volume per theme: <br> <code class="bg-white px-2 py-1 rounded border">V<sub>4</sub> = 15<sup>218,666</sup> &approx; 10<sup>257,175</sup></code></p>
-                            <p class="text-sm text-secondary mt-2">Information-theoretic interpretation: <code>H<sub>1</sub> > H<sub>2</sub> > H<sub>3</sub> > H<sub>4</sub></code> while Mutual Information <code>I(text;meaning)</code> rises sharply. We are approaching the thin manifold of human thought.</p>
-                        </div>
-
-                        <div class="bg-slate-900 text-stone-300 p-4 rounded mb-6 overflow-x-auto mono text-sm">
-                            <div class="text-stone-500 mb-2"># Python Implementation</div>
-<pre><code>import random
-
-GRAPH = { # A thematic subgraph for "astronomy"
-    "stars": ["burn", "collapse", "shine"],
-    "collapse": ["into", "slowly", "violently"],
-    "into": ["black_holes", "dust", "void"]
-}
-
-def semantic_walk(seed_concept, length):
-    result = [seed_concept]
-    for _ in range(length - 1):
-        next_words = GRAPH.get(result[-1], ["stars"])
-        result.append(random.choice(next_words))
-    return " ".join(result)</code></pre>
-                        </div>
-                        
-                        <h4 class="font-bold text-sm uppercase tracking-wide mb-2 text-accent">Live Generation Preview</h4>
-                        <div class="book-page mono" id="preview-4">Generating semantic manifold...</div>
-                    </div>
-
+                <p class="mb-4 text-slate-700 leading-relaxed">
+                    <strong>The Agreement:</strong> To ensure absolute coherence between theory and application, we hereby standardize exactly <strong>7 Progressive Stages (Modes)</strong>. All stages operate on a strictly normalized English orthographic alphabet (26 letters + space + 4 punctuation marks = 31 total symbols). The implemented formulas reflect the Python code's computational realities.
+                </p>
+                
+                <div class="overflow-x-auto mt-6">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b border-slate-300">
+                                <th class="p-3 font-semibold">Unified Stage Name</th>
+                                <th class="p-3 font-semibold">Python Mode ID</th>
+                                <th class="p-3 font-semibold">Agreed Data & Implementation Logic</th>
+                                <th class="p-3 font-semibold">Final Combinatorial Formula</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-600">
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 0: English Baseline</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">borges-library</td>
+                                <td class="p-3">Character-based generation using 31-symbol English alphabet to align baseline entropy.</td>
+                                <td class="p-3 mono bg-slate-50">31^N</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 1: Lexical Reduction</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">word-based</td>
+                                <td class="p-3">Tokens selected from combined Word ($W$) and Punctuation ($P$) arrays.</td>
+                                <td class="p-3 mono bg-slate-50">(W+P)^N</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 2: Punctuation-Constrained</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">punctuation-constrained</td>
+                                <td class="p-3">State-tracking: If previous token is punct, next must be a word.</td>
+                                <td class="p-3 mono bg-slate-50">&sum; C(N-k+1,k) &middot; P^k &middot; W^(N-k)</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 3: Sentence-Structured</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">sentence-structured</td>
+                                <td class="p-3">Modulo 16 check. 15 words forced, 1 punctuation forced at boundary.</td>
+                                <td class="p-3 mono bg-slate-50">W^(15&middot;S) &middot; P^S</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 4: Grammar-Constrained</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">grammar-constrained</td>
+                                <td class="p-3">Cycles through strict Part-of-Speech template arrays (e.g., DET->ADJ->NOUN).</td>
+                                <td class="p-3 mono bg-slate-50">&prod;(cat_size)^repetitions</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 5: Semantic-Constrained</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">semantic-constrained</td>
+                                <td class="p-3">Vocab divided into 64 hash-clusters. Prev word hash unlocks 2 specific target clusters.</td>
+                                <td class="p-3 mono bg-slate-50">W &middot; (W/64 + P)^(N-1)</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold">Stage 6: Topic-Coherent</td>
+                                <td class="p-3 mono text-xs bg-slate-100 rounded">topic-coherent</td>
+                                <td class="p-3">Book coordinate hashes to a fixed 1% ($T$) slice of global vocabulary.</td>
+                                <td class="p-3 mono bg-slate-50">W &middot; (T + P)^N</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
 
-        <!-- Section 2: Chart -->
-        <section class="mb-20 bg-stone-100 p-8 rounded-xl">
-            <div class="mb-8 max-w-3xl">
-                <h2 class="text-3xl font-bold serif mb-4">II. The Combinatorial Collapse</h2>
-                <p class="text-lg text-secondary">
-                    As we apply progressive constraints, the total volume of possible books in the library drops exponentially. Conversely, the probability of extracting a "meaningful" sequence of thoughts increases. This visualization maps the phase transition from noise to literature.
-                </p>
-            </div>
+        <!-- Section II: Interactive Model Explorer -->
+        <section class="mb-16" id="models">
+            <h2 class="text-2xl font-bold serif mb-6 border-b-2 border-slate-200 pb-2">II. Model Formalization & Preview</h2>
             
-            <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm">
-                <!-- Chart Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Vertical Tabs -->
+                <div class="lg:col-span-3 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
+                    <button onclick="switchTab(0)" id="tab-0" class="tab-btn active text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">0. English Baseline</button>
+                    <button onclick="switchTab(1)" id="tab-1" class="tab-btn text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">1. Lexical Reduction</button>
+                    <button onclick="switchTab(2)" id="tab-2" class="tab-btn text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">2. Punctuation Rule</button>
+                    <button onclick="switchTab(3)" id="tab-3" class="tab-btn text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">3. Sentence Rhythm</button>
+                    <button onclick="switchTab(4)" id="tab-4" class="tab-btn text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">4. Grammar Syntax</button>
+                    <button onclick="switchTab(5)" id="tab-5" class="tab-btn text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">5. Semantic Clusters</button>
+                    <button onclick="switchTab(6)" id="tab-6" class="tab-btn text-left px-4 py-3 border-l-4 border-transparent hover:bg-slate-100 rounded-r text-sm whitespace-nowrap lg:whitespace-normal transition-colors">6. Topic Subsets</button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="lg:col-span-9 bg-surface border border-borderSubtle shadow-sm rounded-lg p-6 lg:p-8 min-h-[500px] relative">
+                    
+                    <!-- Content populated by JS -->
+                    <div id="tab-title" class="text-2xl font-bold serif mb-3 text-accent">Stage Title</div>
+                    <p id="tab-desc" class="mb-5 text-slate-600 leading-relaxed">Description goes here.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Math Model</h4>
+                            <div id="tab-math" class="mono text-sm bg-white p-3 border border-slate-200 rounded text-slate-800"></div>
+                        </div>
+                        <div class="bg-slate-900 p-4 rounded border border-slate-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Python Core Logic</h4>
+                            <pre id="tab-code" class="mono text-xs text-slate-300 overflow-x-auto whitespace-pre-wrap"></pre>
+                        </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Live Text Preview (Dynamically Generated)</h4>
+                    <div id="tab-preview" class="book-page mono">Loading...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III: Chart -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold serif mb-6 border-b-2 border-slate-200 pb-2">III. The Combinatorial Collapse</h2>
+            <div class="bg-surface p-6 rounded-lg border border-borderSubtle shadow-sm">
+                <p class="mb-6 text-slate-600 max-w-3xl">
+                    Plotting the exponent sizes highlights the sheer magnitude of entropy destruction. As constraints increase, the theoretical volume drops exponentially. Note that Semantic (Stage 5) possesses a slightly larger volume than strict Grammar (Stage 4), because semantic clusters allow 1,500 words per slot, whereas rigid POS filtering restricts choices much tighter structurally, even if semantics yield more "meaning".
+                </p>
                 <div class="chart-container">
                     <canvas id="entropyChart"></canvas>
                 </div>
-                <p class="text-center text-sm text-stone-500 mt-4">Note: The Y1 axis (Combinatorial Volume) is logarithmic. The Y2 axis represents a theoretical index of Human Readability.</p>
             </div>
         </section>
 
-        <!-- Section 3: The Deterministic Simulator (Task 3) -->
-        <section class="mb-20 border-t border-stone-200 pt-16">
-            <div class="mb-10 text-center max-w-3xl mx-auto">
-                <h2 class="text-3xl font-bold serif mb-4">III. The On-Demand Library Simulator</h2>
-                <p class="text-lg text-secondary">
-                    How do we store an infinite library? We don't. By utilizing seeded Pseudo-Random Number Generation (PRNG), the exact text of any page in any book exists inherently in the mathematics. <strong>This algorithm displays any page instantly without saving the book in memory.</strong>
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 bg-white p-6 md:p-8 rounded-xl border border-stone-200 shadow-xl">
-                
-                <!-- Controls -->
-                <div class="md:col-span-4 bg-stone-50 p-6 rounded-lg border border-stone-200">
-                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                        <span class="text-xl">⚙️</span> Generation Parameters
-                    </h3>
-                    
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-1 text-stone-700">Book Seed (Hexagon/Shelf/Vol)</label>
-                        <input type="text" id="sim-seed" value="Borges_1941" class="w-full px-3 py-2 border border-stone-300 rounded font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold mb-1 text-stone-700">Page Number (1 - 410)</label>
-                        <input type="number" id="sim-page" value="1" min="1" max="410" class="w-full px-3 py-2 border border-stone-300 rounded font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold mb-1 text-stone-700">Constraint Model</label>
-                        <select id="sim-model" class="w-full px-3 py-2 border border-stone-300 rounded font-sans text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-white">
-                            <option value="1">Model 1: Pure Entropy (Chars)</option>
-                            <option value="2">Model 2: Lexical (Words)</option>
-                        </select>
-                    </div>
-                    
-                    <button id="sim-btn" class="w-full bg-ink hover:bg-stone-800 text-white font-bold py-3 px-4 rounded transition-colors shadow-md">
-                        Fetch Page From Void
-                    </button>
-                    
-                    <div class="mt-6 text-xs text-secondary leading-relaxed">
-                        <strong>Algorithm:</strong> Concatenates the Book Seed and Page Number, generates a 32-bit integer hash via <code>xmur3</code>, and seeds a <code>mulberry32</code> PRNG. Characters or words are deterministically mapped from this sequence. Memory footprint: O(1).
-                    </div>
-                </div>
-                
-                <!-- Output Canvas -->
-                <div class="md:col-span-8">
-                    <div class="flex justify-between items-end mb-2">
-                        <h3 class="font-bold text-stone-700">Output Window</h3>
-                        <span id="sim-status" class="text-xs font-mono text-stone-500">Vol: Borges_1941 | Page: 1</span>
-                    </div>
-                    <div id="sim-output" class="book-page mono text-sm w-full h-[500px]"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Future Horizons (Task 2) -->
-        <section class="mb-10 bg-ink text-stone-200 p-8 md:p-12 rounded-xl">
-            <h2 class="text-3xl font-bold serif mb-6 text-white">IV. Beyond the Horizon: Progressively Restrictive Futures</h2>
-            <p class="text-lg mb-8 text-stone-400">
-                To move beyond semantic graphs into true "infinite coherent literature," we must introduce macro-structural constraints. If these steps were added to the research, they would require significant computational leaps.
+        <!-- Section IV: The Deterministic Simulator -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold serif mb-6 border-b-2 border-slate-200 pb-2">IV. The O(1) Memoryless Simulator</h2>
+            <p class="text-slate-600 mb-6 max-w-3xl">
+                This interactive tool translates the agreed-upon Python architecture into client-side JavaScript. By utilizing a <code>cyrb53</code> string hashing algorithm (acting as a stand-in for <code>hashlib.sha256</code>), it maps absolute string coordinates to uniform 32-bit integers deterministically. <strong>No text is stored in memory.</strong>
             </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-stone-800 p-6 rounded-lg border border-stone-700">
-                    <h3 class="text-xl font-bold mb-3 text-accent serif">Step 5: Latent Space Traversal (LLMs)</h3>
-                    <p class="mb-4 text-sm leading-relaxed">
-                        Instead of discrete word graphs, text generation is modeled as continuous integration over a high-dimensional vector field (Transformer latent space). A book is a smooth trajectory through this space.
-                    </p>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">Math Model</h4>
-                    <p class="text-sm font-mono bg-black p-3 rounded mb-4">
-                        P(w_t | w_1...w_{t-1}) = softmax(W·h_t)<br>
-                        where trajectory T minimizes semantic drift D(t).
-                    </p>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">Implementation Needs</h4>
-                    <p class="text-sm">Requires loading heavy tensor architectures in memory (e.g., Llama 3) and custom samplers to force deterministic generation from a starting topological coordinate.</p>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 bg-surface p-6 rounded-lg border border-borderSubtle shadow-xl">
+                <!-- Controls -->
+                <div class="md:col-span-4 flex flex-col gap-4 bg-slate-50 p-5 rounded border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Hexagon / Book Seed</label>
+                        <input type="text" id="sim-seed" value="Borges_1941" class="w-full px-3 py-2 border border-slate-300 rounded font-mono text-sm focus:ring-2 focus:ring-accent outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Page Number</label>
+                        <input type="number" id="sim-page" value="1" min="1" max="410" class="w-full px-3 py-2 border border-slate-300 rounded font-mono text-sm focus:ring-2 focus:ring-accent outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Constraint Model</label>
+                        <select id="sim-model" class="w-full px-3 py-2 border border-slate-300 rounded text-sm bg-white focus:ring-2 focus:ring-accent outline-none">
+                            <option value="0">0. English Baseline (Chars)</option>
+                            <option value="1">1. Lexical Reduction (Words)</option>
+                            <option value="2">2. Punctuation Constrained</option>
+                            <option value="3">3. Sentence Structured</option>
+                            <option value="4">4. Grammar Constrained</option>
+                            <option value="5" selected>5. Semantic Constrained</option>
+                            <option value="6">6. Topic Coherent</option>
+                        </select>
+                    </div>
+                    <button id="sim-generate" class="mt-2 w-full bg-accent hover:bg-accentHover text-white font-bold py-3 px-4 rounded transition-colors">
+                        Synthesize Address
+                    </button>
                 </div>
-
-                <div class="bg-stone-800 p-6 rounded-lg border border-stone-700">
-                    <h3 class="text-xl font-bold mb-3 text-accent serif">Step 6: Global Logical Consistency</h3>
-                    <p class="mb-4 text-sm leading-relaxed">
-                        The ultimate constraint. A book must not contradict itself from page 1 to 410. The library acts as a formal theorem prover. Character attributes, physics, and causal timelines must resolve perfectly.
-                    </p>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">Math Model</h4>
-                    <p class="text-sm font-mono bg-black p-3 rounded mb-4">
-                        Let state S_t = S_{t-1} + statement(w_t).<br>
-                        Constraint: Satisfiability(S_t) == True ∀ t
-                    </p>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">Implementation Needs</h4>
-                    <p class="text-sm">Coupling an LLM generator with a symbolic logic engine (like Z3 SMT solver). The text engine proposes next paragraphs; the logic engine verifies facts against the global knowledge base. Computationally immense.</p>
+                
+                <!-- Output Window -->
+                <div class="md:col-span-8 flex flex-col">
+                    <div class="bg-slate-800 text-slate-400 text-xs px-4 py-2 rounded-t font-mono flex justify-between">
+                        <span>> _stdout</span>
+                        <span id="sim-status">WAITING</span>
+                    </div>
+                    <div id="sim-output" class="book-page mono text-sm flex-grow rounded-b border-t-0 rounded-t-none h-[400px]">
+                        // Select a model and generate to view text.
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- Section V: Advanced Frontiers -->
+        <section>
+            <h2 class="text-2xl font-bold serif mb-6 border-b-2 border-slate-200 pb-2">V. High-Resource Implementation Requirements (Stages 7 & 8)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-surface p-6 rounded-lg border border-borderSubtle">
+                    <h3 class="font-bold text-lg text-accent mb-2">Stage 7: Neural Steganography & Arithmetic Coding</h3>
+                    <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                        Achieving indistinguishable-from-human text requires repurposing Large Language Models (LLMs). The coordinate seed acts as a random bitstream fed into an arithmetic decoder. The LLM estimates next-token probabilities $P(x_t|x_{<t})$, and the decoder selects the token mapping to the seed's numerical interval.
+                    </p>
+                    <p class="text-xs font-mono bg-slate-100 p-2 rounded text-slate-700">max H(Q) subject to D_KL(Q || P) &leq; &epsilon;</p>
+                    <div class="mt-4 text-xs text-slate-500 border-l-2 border-slate-300 pl-3">
+                        <strong>Resource Needs:</strong> Requires highly deterministic localized deployment of open-weights models (16-32GB VRAM). APIs fail due to non-deterministic logits.
+                    </div>
+                </div>
+                <div class="bg-surface p-6 rounded-lg border border-borderSubtle">
+                    <h3 class="font-bold text-lg text-accent mb-2">Stage 8: Reversible Generative Flows</h3>
+                    <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                        If floating-point non-determinism in autoregressive transformers breaks arithmetic coding, Integer Discrete Flows offer perfect mathematical reversibility. The coordinate maps to a continuous latent vector, flowing deterministically through invertible network layers.
+                    </p>
+                    <p class="text-xs font-mono bg-slate-100 p-2 rounded text-slate-700">T(x) = z &harr; T^-1(z) = x</p>
+                    <div class="mt-4 text-xs text-slate-500 border-l-2 border-slate-300 pl-3">
+                        <strong>Resource Needs:</strong> Requires training massive discrete equivalents of normalizing flows (like WaveGlow for text). Computationally extreme but mathematically pure.
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <footer class="bg-stone-100 py-8 text-center text-stone-500 text-sm border-t border-stone-200">
-        <p>Information Architecture & Interactive Simulation Module</p>
-        <p class="mt-2">"The true Library of meaning is not infinite. It is an extraordinarily compressed island hidden inside Borges’ cosmic desert of symbols."</p>
-    </footer>
-
+    <!-- Scripts -->
     <script>
-        // --- DATA & CONTENT GENERATORS FOR PREVIEWS ---
-        const ALPHABET = "abcdefghijklmnopqrstuvwxyz ,.";
-        const VOCABULARY = ["time", "light", "shadow", "mirror", "labyrinth", "man", "walks", "sees", "infinity", "hexagon", "book", "page", "letter", "symbol", "truth", "void", "library", "universe", "sand", "babel"];
-        const MARKOV_MATRIX = {
-            "the": ["man", "labyrinth", "mirror", "book", "void"],
-            "man": ["walks", "sees", "is", "finds"],
-            "labyrinth": ["is", "hides", "stretches"],
-            "mirror": ["reflects", "shows", "distorts"],
-            "book": ["contains", "explains", "lies"],
-            "walks": ["through", "into", "past"],
-            "is": ["infinite", "dark", "silent", "lost"],
-            "finds": ["the", "a", "nothing"],
-            "infinite": ["time", "space", "sand"],
-            "silent": ["void", "library", "man"]
-        };
-        const SEMANTIC_GRAPH = {
-            "stars": ["burn", "collapse", "shine", "fade"],
-            "collapse": ["into", "slowly", "violently"],
-            "into": ["black_holes", "dust", "void"],
-            "black_holes": ["consume", "bend", "warp"],
-            "consume": ["light", "time", "matter"],
-            "light": ["escapes", "bends", "fades"]
+        // --- 1. DATA MODELS & UTILITIES ---
+        
+        // cyrb53: A fast, deterministic hash function converting string to 32-bit integer
+        // Used to simulate hashlib.sha256 in the frontend.
+        const cyrb53 = (str, seed = 0) => {
+            let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+            for (let i = 0, ch; i < str.length; i++) {
+                ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return 4294967296 * (2097151 & h2) + (h1 >>> 0);
         };
 
-        // Utility: Standard Random (for previews)
-        function getRandomChars(length) {
-            let res = '';
-            for(let i=0; i<length; i++) res += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length));
-            return res;
-        }
+        const getHashIndex = (seed, mod) => cyrb53(seed) % mod;
 
-        // --- PREVIEW GENERATORS (Task 1 Support) ---
-        function generatePreview1() {
+        // Common Alphabets and Pools
+        const ALPHABET_31 = "abcdefghijklmnopqrstuvwxyz .?!,";
+        const PUNCT_POOL = [".", "?", "!", ","];
+        const PUNCT_END = [".", "?", "!"]; // Used for sentence endings
+        
+        // Grammar Dictionary (Replaces 100,000 word vocab for client demo)
+        const POS_DICT = {
+            "DET": ["the", "a", "an", "this", "that", "some", "every", "each", "no"],
+            "ADJ": ["dark", "old", "vast", "silent", "ancient", "strange", "bright", "deep", "fractal", "infinite", "broken", "empty"],
+            "NOUN": ["river", "house", "mirror", "memory", "library", "book", "dream", "shadow", "labyrinth", "void", "symbol", "axiom", "truth", "page"],
+            "VERB": ["contains", "reflects", "holds", "reveals", "hides", "carries", "echoes", "fills", "seeks", "destroys", "shatters", "bends"],
+            "PREP": ["in", "on", "through", "beyond", "under", "within", "across"]
+        };
+        
+        // Flatten into general vocabulary
+        const VOCAB_POOL = Object.values(POS_DICT).flat();
+        const COMBINED_POOL = VOCAB_POOL.concat(PUNCT_POOL);
+        const GRAMMAR_TEMPLATE = ["DET", "ADJ", "NOUN", "VERB", "DET", "NOUN", "PUNCT"];
+
+        // Semantic Cluster Mocking (Stage 5) - Distribute VOCAB into 64 pseudo-clusters
+        const CLUSTERS = Array.from({length: 64}, () => []);
+        VOCAB_POOL.forEach(word => {
+            let h = cyrb53(word, 99);
+            CLUSTERS[h % 64].push(word);
+        });
+        // Fill empty clusters for safety
+        CLUSTERS.forEach(c => { if(c.length === 0) c.push("void"); });
+
+
+        // --- 2. GENERATOR LOGIC (O(1) Implementations matching Python) ---
+        
+        function generateStage0(seed, page) {
             let text = "";
-            for(let line=0; line<8; line++) {
-                text += getRandomChars(60) + "\n";
+            let charsPerPage = 3200; // 40 lines * 80 chars
+            let start = page * charsPerPage;
+            for(let i=0; i<charsPerPage; i++) {
+                let idx = getHashIndex(`${seed}:char:${start+i}`, 31);
+                text += ALPHABET_31[idx];
             }
-            document.getElementById('preview-1').textContent = text;
+            // Format to 80 chars per line
+            return text.match(/.{1,80}/g).join("\n");
         }
 
-        function generatePreview2() {
-            let text = "";
-            for(let line=0; line<8; line++) {
-                let words = [];
-                for(let w=0; w<10; w++) words.push(VOCABULARY[Math.floor(Math.random() * VOCABULARY.length)]);
-                text += words.join(" ") + "\n";
+        function generateStage1(seed, page) {
+            let tokens = [];
+            let start = page * 300;
+            for(let i=0; i<300; i++) {
+                let idx = getHashIndex(`${seed}:lex:${start+i}`, COMBINED_POOL.length);
+                tokens.push(COMBINED_POOL[idx]);
             }
-            document.getElementById('preview-2').textContent = text;
+            return renderTokens(tokens);
         }
 
-        function generatePreview3() {
-            let text = "";
-            let current = "the";
-            for(let line=0; line<8; line++) {
-                let words = [];
-                for(let w=0; w<10; w++) {
-                    words.push(current);
-                    let choices = MARKOV_MATRIX[current] || ["the"];
-                    current = choices[Math.floor(Math.random() * choices.length)];
-                }
-                text += words.join(" ") + "\n";
-            }
-            document.getElementById('preview-3').textContent = text;
-        }
-
-        function generatePreview4() {
-            let text = "";
-            let current = "stars";
-            for(let line=0; line<8; line++) {
-                let words = [];
-                for(let w=0; w<10; w++) {
-                    words.push(current);
-                    let choices = SEMANTIC_GRAPH[current] || ["stars"];
-                    current = choices[Math.floor(Math.random() * choices.length)];
-                }
-                text += words.join(" ") + "\n";
-            }
-            document.getElementById('preview-4').textContent = text;
-        }
-
-        // Tab Navigation Logic
-        function showModel(id) {
-            // Hide all contents
-            document.querySelectorAll('.model-content').forEach(el => el.classList.add('hidden'));
-            // Reset all buttons
-            document.querySelectorAll('.model-tab-btn').forEach(el => {
-                el.classList.remove('bg-stone-100', 'border-accent');
-                el.classList.add('border-transparent');
-            });
+        function generateStage2(seed, page) {
+            let tokens = [];
+            let start = page * 300;
+            let prevIsPunct = false; // Simplified page start state
             
-            // Show selected content
-            document.getElementById(`model-${id}`).classList.remove('hidden');
-            // Highlight selected button
-            const btn = document.getElementById(`btn-model-${id}`);
-            btn.classList.add('bg-stone-100', 'border-accent');
-            btn.classList.remove('border-transparent');
-
-            // Trigger generation
-            if(id === 1) generatePreview1();
-            if(id === 2) generatePreview2();
-            if(id === 3) generatePreview3();
-            if(id === 4) generatePreview4();
-        }
-
-        // Initialize first tab
-        showModel(1);
-
-
-        // --- PRNG LOGIC FOR TASK 3 (The Simulator) ---
-        // Hash function to map string to a 32-bit seed
-        function xmur3(str) {
-            for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
-                h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-                h = h << 13 | h >>> 19;
-            } return function() {
-                h = Math.imul(h ^ (h >>> 16), 2246822507);
-                h = Math.imul(h ^ (h >>> 13), 3266489909);
-                return (h ^= h >>> 16) >>> 0;
-            }
-        }
-
-        // Seeded random number generator
-        function mulberry32(a) {
-            return function() {
-              var t = a += 0x6D2B79F5;
-              t = Math.imul(t ^ t >>> 15, t | 1);
-              t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-              return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            }
-        }
-
-        function runSimulator() {
-            const seedStr = document.getElementById('sim-seed').value;
-            const pageNum = document.getElementById('sim-page').value;
-            const modelNum = document.getElementById('sim-model').value;
-            const outputDiv = document.getElementById('sim-output');
-            const statusSpan = document.getElementById('sim-status');
-            
-            statusSpan.textContent = `Vol: ${seedStr} | Page: ${pageNum}`;
-            outputDiv.innerHTML = '<span class="text-stone-400">Locating coordinates in the void...</span>';
-
-            // Create deterministic seed for this specific page
-            const compositeKey = `${seedStr}_PAGE_${pageNum}`;
-            const seedFunc = xmur3(compositeKey);
-            const prng = mulberry32(seedFunc()); // instantiate generator
-
-            setTimeout(() => {
-                let pageText = "";
-                const LINES = 40;
+            for(let i=0; i<300; i++) {
+                let hStr = `${seed}:punct:${start+i}`;
+                let candidateIdx = getHashIndex(hStr, COMBINED_POOL.length);
+                let candidate = COMBINED_POOL[candidateIdx];
                 
-                if (modelNum === "1") {
-                    // Pure Entropy (80 chars per line)
-                    for(let l=0; l<LINES; l++) {
-                        let line = "";
-                        for(let c=0; c<80; c++) {
-                            const charIdx = Math.floor(prng() * ALPHABET.length);
-                            line += ALPHABET.charAt(charIdx);
-                        }
-                        pageText += line + "\n";
-                    }
+                if (prevIsPunct && PUNCT_POOL.includes(candidate)) {
+                    let wordIdx = getHashIndex(`${hStr}_fallback`, VOCAB_POOL.length);
+                    candidate = VOCAB_POOL[wordIdx];
+                }
+                tokens.push(candidate);
+                prevIsPunct = PUNCT_POOL.includes(candidate);
+            }
+            return renderTokens(tokens);
+        }
+
+        function generateStage3(seed, page) {
+            let tokens = [];
+            let start = page * 300;
+            for(let i=0; i<300; i++) {
+                let posInSentence = (start + i) % 16;
+                if (posInSentence === 15) {
+                    let idx = getHashIndex(`${seed}:s3_p:${start+i}`, PUNCT_END.length);
+                    tokens.push(PUNCT_END[idx]);
                 } else {
-                    // Lexical (approx 13 words per line)
-                    for(let l=0; l<LINES; l++) {
-                        let words = [];
-                        for(let w=0; w<13; w++) {
-                            const wordIdx = Math.floor(prng() * VOCABULARY.length);
-                            words.push(VOCABULARY[wordIdx]);
-                        }
-                        pageText += words.join(" ") + "\n";
-                    }
+                    let idx = getHashIndex(`${seed}:s3_w:${start+i}`, VOCAB_POOL.length);
+                    tokens.push(VOCAB_POOL[idx]);
                 }
-                
-                outputDiv.textContent = pageText;
-            }, 300); // slight delay for UX
+            }
+            return renderTokens(tokens);
         }
 
-        document.getElementById('sim-btn').addEventListener('click', runSimulator);
-        // Initial run
-        runSimulator();
+        function generateStage4(seed, page) {
+            let tokens = [];
+            let start = page * 300;
+            for(let i=0; i<300; i++) {
+                let posTag = GRAMMAR_TEMPLATE[(start + i) % 7];
+                let choices = posTag === "PUNCT" ? PUNCT_END : POS_DICT[posTag];
+                let idx = getHashIndex(`${seed}:s4:${start+i}`, choices.length);
+                tokens.push(choices[idx]);
+            }
+            return renderTokens(tokens);
+        }
 
+        function generateStage5(seed, page) {
+            let tokens = [];
+            let start = page * 300;
+            let prevWord = "";
+            for(let i=0; i<300; i++) {
+                if(i===0) {
+                    let idx = getHashIndex(`${seed}:s5_start:${start+i}`, COMBINED_POOL.length);
+                    prevWord = COMBINED_POOL[idx];
+                    tokens.push(prevWord);
+                    continue;
+                }
+                
+                let hCluster = cyrb53(prevWord, 42);
+                let c1 = hCluster % 64;
+                let c2 = (hCluster + 1) % 64;
+                let allowed = CLUSTERS[c1].concat(CLUSTERS[c2], PUNCT_POOL);
+                
+                let idx = getHashIndex(`${seed}:s5:${start+i}`, allowed.length);
+                let word = allowed[idx];
+                tokens.push(word);
+                prevWord = word;
+            }
+            return renderTokens(tokens);
+        }
 
-        // --- CHART.JS IMPLEMENTATION ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('entropyChart').getContext('2d');
+        function generateStage6(seed, page) {
+            let tokens = [];
+            let start = page * 300;
             
-            const data = {
-                labels: ['1. Character Chaos', '2. Lexical Domain', '3. Syntactic Chains', '4. Semantic Manifolds'],
-                datasets: [
-                    {
-                        label: 'Log of Combinatorial Volume',
-                        data: [1834097, 1027511, 437332, 257175],
-                        borderColor: '#2c2825', // ink
-                        backgroundColor: 'rgba(44, 40, 37, 0.1)',
+            // Topic selection tied strictly to the BOOK seed, not the page.
+            let hBook = cyrb53(seed, 101);
+            let subsetSize = Math.max(5, Math.floor(VOCAB_POOL.length / 4)); // e.g. 25% of vocab
+            let subset = [];
+            let startIdx = hBook % VOCAB_POOL.length;
+            for(let j=0; j<subsetSize; j++) {
+                subset.push(VOCAB_POOL[(startIdx + j) % VOCAB_POOL.length]);
+            }
+            let topicPool = subset.concat(PUNCT_POOL);
+
+            for(let i=0; i<300; i++) {
+                let idx = getHashIndex(`${seed}:s6:${start+i}`, topicPool.length);
+                tokens.push(topicPool[idx]);
+            }
+            return renderTokens(tokens);
+        }
+
+        // Standard renderer: attaches punctuation to preceding words
+        function renderTokens(tokens) {
+            let text = "";
+            for(let t of tokens) {
+                if(PUNCT_POOL.includes(t)) text += t;
+                else text += " " + t;
+            }
+            return text.trim();
+        }
+
+        // --- 3. UI STATE MANAGEMENT (Tabs) ---
+        const TABS_DATA = [
+            {
+                title: "Stage 0: English-Language Borges Baseline",
+                desc: "The combinatorial baseline. Normalizes the original 25-character library into a 31-symbol English alphabet (26 letters, space, period, comma, question, exclamation). Everything is independent and uniformly distributed.",
+                math: "Total Books = 31^(1,312,000)\nVolume: ~10^1,956,667",
+                code: "def generate_token(seed, pos):\n    idx = hash(seed, pos) % 31\n    return ALPHABET_31[idx]"
+            },
+            {
+                title: "Stage 1: Lexical Reduction (Word-Based)",
+                desc: "Abandons character permutations. Every token is drawn from a predefined array of English words or punctuation marks. Guarantees phonetic readability but destroys syntax.",
+                math: "Total Books = (W + P)^N\nN ≈ 218,667 slots",
+                code: "def generate_token(seed, pos):\n    vocab = WORDS + PUNCT\n    idx = hash(seed, pos) % len(vocab)\n    return vocab[idx]"
+            },
+            {
+                title: "Stage 2: Punctuation-Constrained",
+                desc: "Prevents adjacent punctuation clustering. The algorithm tracks state: if the previous token was punctuation, the current generation cycle strictly bounds selection to the Word array.",
+                math: "Volume = &sum; C(N-k+1,k) &middot; P^k &middot; W^(N-k)",
+                code: "if prev_is_punct:\n    idx = hash() % len(WORDS)\n    return WORDS[idx]\nelse:\n    return (WORDS+PUNCT)[hash() % all]"
+            },
+            {
+                title: "Stage 3: Sentence-Structured",
+                desc: "Forces a rigid periodic rhythm. A sentence is strictly defined as exactly 15 words followed by exactly 1 punctuation mark. Visual pacing mimics prose perfectly.",
+                math: "S = N / 16 (Sentences per book)\nVolume = W^(15S) &middot; P^S",
+                code: "pos_in_sentence = pos % 16\nif pos_in_sentence == 15:\n    return PUNCT[hash() % len(PUNCT)]\nelse:\n    return WORDS[hash() % len(WORDS)]"
+            },
+            {
+                title: "Stage 4: Grammar-Constrained",
+                desc: "Applies Context-Free Grammar. Vocabulary is partitioned into parts of speech. Generation strictly cycles through a template (e.g., DET -> ADJ -> NOUN -> VERB).",
+                math: "Volume = &prod;(cat_size)^S\nE.g., (D&middot;A&middot;N&middot;V&middot;D&middot;N&middot;P)^S",
+                code: "pos_tag = TEMPLATE[pos % len(TEMPLATE)]\nchoices = POS_DICT[pos_tag]\nidx = hash() % len(choices)\nreturn choices[idx]"
+            },
+            {
+                title: "Stage 5: Semantic-Constrained",
+                desc: "Simulates Markovian transitions. The vocabulary is divided into 64 clusters. The hash of the previous word determines which 2 clusters the next word is permitted to be drawn from.",
+                math: "Approx: W &middot; (W/64 + P)^(N-1)\nTheoretical Bound: &lambda;_max^N",
+                code: "c1 = hash(prev_token) % 64\nc2 = (hash(prev_token) + 1) % 64\nallowed = clusters[c1] + clusters[c2]\nreturn allowed[hash() % len(allowed)]"
+            },
+            {
+                title: "Stage 6: Topic-Coherent",
+                desc: "Forces global long-range constraints. The book's coordinate seed selects a fixed subset (e.g. 1%) of the vocabulary. The entire volume is generated solely from this restricted topic manifold.",
+                math: "Volume = W &middot; (T + P)^N\nWhere T is Subset Size (1% of W)",
+                code: "subset = get_subset_for_book(seed)\nidx = hash(seed, pos) % len(subset)\nreturn subset[idx]"
+            }
+        ];
+
+        function switchTab(index) {
+            // Update UI
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${index}`).classList.add('active');
+            
+            // Update Content
+            const data = TABS_DATA[index];
+            document.getElementById('tab-title').textContent = data.title;
+            document.getElementById('tab-desc').textContent = data.desc;
+            document.getElementById('tab-math').innerHTML = data.math.replace(/\n/g, '<br>');
+            document.getElementById('tab-code').textContent = data.code;
+            
+            // Generate Preview
+            let preview = "";
+            const demoSeed = "Preview_Seed_" + Math.random();
+            switch(index) {
+                case 0: preview = generateStage0(demoSeed, 0).substring(0, 500) + "..."; break;
+                case 1: preview = generateStage1(demoSeed, 0).substring(0, 500) + "..."; break;
+                case 2: preview = generateStage2(demoSeed, 0).substring(0, 500) + "..."; break;
+                case 3: preview = generateStage3(demoSeed, 0).substring(0, 500) + "..."; break;
+                case 4: preview = generateStage4(demoSeed, 0).substring(0, 500) + "..."; break;
+                case 5: preview = generateStage5(demoSeed, 0).substring(0, 500) + "..."; break;
+                case 6: preview = generateStage6(demoSeed, 0).substring(0, 500) + "..."; break;
+            }
+            document.getElementById('tab-preview').textContent = preview;
+        }
+
+        // --- 4. SIMULATOR LOGIC ---
+        document.getElementById('sim-generate').addEventListener('click', () => {
+            const seed = document.getElementById('sim-seed').value;
+            const page = parseInt(document.getElementById('sim-page').value) || 1;
+            const modelIndex = parseInt(document.getElementById('sim-model').value);
+            
+            document.getElementById('sim-status').innerHTML = `<span class="text-emerald-400">LOC: ${seed}::PG:${page}</span>`;
+            
+            let output = "";
+            switch(modelIndex) {
+                case 0: output = generateStage0(seed, page); break;
+                case 1: output = generateStage1(seed, page); break;
+                case 2: output = generateStage2(seed, page); break;
+                case 3: output = generateStage3(seed, page); break;
+                case 4: output = generateStage4(seed, page); break;
+                case 5: output = generateStage5(seed, page); break;
+                case 6: output = generateStage6(seed, page); break;
+            }
+            document.getElementById('sim-output').textContent = output;
+        });
+
+        // --- 5. INITIALIZATION & CHART ---
+        document.addEventListener("DOMContentLoaded", () => {
+            switchTab(0);
+            
+            // Entropy Collapse Chart
+            const ctx = document.getElementById('entropyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['S0: English Base', 'S1: Lexical', 'S2: Punctuation', 'S3: Sentence', 'S4: Grammar', 'S5: Semantic', 'S6: Topic'],
+                    datasets: [{
+                        label: 'Log10(Combinatorial Volume)',
+                        data: [1956667, 1093340, 1080000, 1033178, 285632, 698591, 656000],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
                         borderWidth: 2,
-                        yAxisID: 'y',
                         fill: true,
                         tension: 0.3,
-                        pointBackgroundColor: '#2c2825'
-                    },
-                    {
-                        label: 'Semantic Readability Index (%)',
-                        data: [0.0001, 2.5, 15, 65],
-                        borderColor: '#b45309', // accent amber
-                        backgroundColor: '#b45309',
-                        borderWidth: 3,
-                        borderDash: [5, 5],
-                        yAxisID: 'y1',
-                        fill: false,
-                        tension: 0.3,
-                        pointBackgroundColor: '#b45309',
-                        pointRadius: 5
-                    }
-                ]
-            };
-
-            const config = {
-                type: 'line',
-                data: data,
+                        pointBackgroundColor: '#312e81',
+                        pointRadius: 4
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
                     plugins: {
-                        title: {
-                            display: true,
-                            text: 'The Collapse of Volume vs The Rise of Meaning',
-                            font: { family: 'Merriweather', size: 16 },
-                            color: '#2c2825'
-                        },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) label += ': ';
-                                    if (context.datasetIndex === 0) {
-                                        label += '10^' + context.parsed.y.toLocaleString();
-                                    } else {
-                                        label += context.parsed.y + '%';
-                                    }
-                                    return label;
-                                }
+                                label: (ctx) => `10^${ctx.parsed.y.toLocaleString()} possible books`
                             }
-                        }
+                        },
+                        legend: { display: false }
                     },
                     scales: {
                         y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Volume Exponent (10^x)'
-                            },
-                            grid: { color: '#e7e5e4' }
+                            title: { display: true, text: 'Log10 of Total Volumes' },
+                            grid: { color: '#e2e8f0' }
                         },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Human Readability (%)'
-                            },
-                            grid: { drawOnChartArea: false },
-                            min: 0,
-                            max: 100
+                        x: {
+                            grid: { display: false }
                         }
                     }
                 }
-            };
-
-            new Chart(ctx, config);
+            });
         });
-
     </script>
 </body>
 </html>

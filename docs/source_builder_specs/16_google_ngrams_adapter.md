@@ -18,7 +18,7 @@ Higher n-grams are optional.
 
 Google Ngram is large.
 
-The adapter must support selective streaming and filtering. It must not require downloading the entire dataset for the PoC.
+The adapter must support selective streaming and filtering. It must not require downloading the entire dataset for the application.
 
 ## Fetch Strategy
 

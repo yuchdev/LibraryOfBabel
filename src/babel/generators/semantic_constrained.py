@@ -66,7 +66,7 @@ class SemanticConstrainedGenerator(LibraryGenerator):
         
         # To generate a page, we need the token just before it to maintain continuity.
         # This is expensive if we go from the very beginning of the book.
-        # For simplicity in this PoC, we'll start each page independently (prev_token=None for start of page)
+        # For simplicity in this application, we'll start each page independently (prev_token=None for start of page)
         # OR we can generate previous tokens within the page.
         
         tokens: list[str] = []

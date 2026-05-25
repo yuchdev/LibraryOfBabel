@@ -2,7 +2,7 @@
 
 ## Objective
 
-Use NLTK resources for PoC-quality lexical, corpus, and sentence statistics.
+Use NLTK resources for lexical, corpus, and sentence statistics.
 
 Sources:
 
