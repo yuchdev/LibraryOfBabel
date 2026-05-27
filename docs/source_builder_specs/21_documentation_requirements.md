@@ -1,4 +1,4 @@
-# 21 — Documentation Requirements
+# 21 - Documentation Requirements
 
 ## Objective
 

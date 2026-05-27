@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Optional
 
+import math
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -188,7 +189,7 @@ def cmd_vocab_info(
     console.print(f"  Punctuation marks : {info.punctuation_count}")
     console.print(f"  Normalized        : {info.normalized}")
     console.print(f"  Lowercase         : {info.lowercase}")
-    console.print(f"  Punctuation       : {DEFAULT_PUNCTUATION}")
+    console.print(f"  Punctuation       : {SHARED_PUNCTUATION}")
 
 
 @app.command("metrics")
@@ -225,7 +226,7 @@ def cmd_metrics(
     console.print(f"  log10(size)       : {metrics.log10_size:,.5f}")
     console.print(f"  Size              : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
     if abs(metrics.log10_smaller_than_borges) < 0.1:
-        console.print("  vs Stage 0        : [green]equal[/green]")
+        console.print("  vs Stage 0        : [green]baseline[/green]")
     elif metrics.log10_smaller_than_borges > 0:
         console.print(
             "  vs Stage 0        : "
@@ -236,6 +237,13 @@ def cmd_metrics(
             "  vs Stage 0        : "
             f"10^{-metrics.log10_smaller_than_borges:,.0f} times [green]larger[/green]"
         )
+
+    if math.isinf(metrics.log10_larger_than_planck_volumes):
+        exceeds_val = "unknown"
+    else:
+        exceeds_val = f"10^{metrics.log10_larger_than_planck_volumes:,.0f}"
+    console.print(f"  exceeds the observable universe by roughly : {exceeds_val}")
+
     if metrics.log10_larger_than_universe_atoms > 0:
         console.print(
             "  vs universe atoms : "
@@ -308,12 +316,18 @@ def cmd_page(
     console.print("\n[bold]Metrics:[/bold]")
     console.print(f"  Library size   : ~{metrics.mantissa:.3f} × 10^{metrics.exponent:,}")
     if abs(metrics.log10_smaller_than_borges) < 0.1:
-        console.print("  Size vs Stage 0 : [green]equal[/green]")
+        console.print("  Size vs Stage 0 : [green]baseline[/green]")
     elif metrics.log10_smaller_than_borges > 0:
         console.print(
             "  Smaller than Stage 0 : "
             f"10^{metrics.log10_smaller_than_borges:,.0f}"
         )
+
+    if math.isinf(metrics.log10_larger_than_planck_volumes):
+        exceeds_val = "unknown"
+    else:
+        exceeds_val = f"10^{metrics.log10_larger_than_planck_volumes:,.0f}"
+    console.print(f"  exceeds the observable universe by roughly : {exceeds_val}")
     console.print("\n[bold]Page:[/bold]")
     console.print(wrap_text(generated.text, width=80))
 
@@ -348,6 +362,7 @@ def cmd_compare(
     table.add_column("vs Planck volumes", justify="right")
 
     bm, be = scientific_from_log10(HISTORICAL_BORGES_LOG10_SIZE)
+    log10_diff_vs_stage0 = BORGES_LOG10_SIZE - HISTORICAL_BORGES_LOG10_SIZE
     table.add_row(
         "Borges (1941 Edition)",
         "Historical",
@@ -355,7 +370,7 @@ def cmd_compare(
         "theoretical",
         f"{HISTORICAL_BORGES_LOG10_SIZE:,.0f}",
         f"~{bm:.2f} × 10^{be:,}",
-        "baseline",
+        f"10^{log10_diff_vs_stage0:,.0f} smaller",
         f"10^{HISTORICAL_BORGES_LOG10_SIZE - UNIVERSE_ATOMS_LOG10:,.0f} larger",
         f"10^{HISTORICAL_BORGES_LOG10_SIZE - OBSERVABLE_UNIVERSE_PLANCK_VOLUMES_LOG10:,.0f} larger",
     )
@@ -373,7 +388,7 @@ def cmd_compare(
             metrics = calculate_metrics(gen.mode_id, log10_sz)
             
             if abs(metrics.log10_smaller_than_borges) < 0.1:
-                vs_borges = "equal"
+                vs_borges = "baseline"
             else:
                 vs_borges = (
                     f"10^{metrics.log10_smaller_than_borges:,.0f} smaller"

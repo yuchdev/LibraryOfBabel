@@ -1,4 +1,4 @@
-# Stage 5 — Markovian Semantic Adjacency Constraint
+# Stage 5 - Markovian Semantic Adjacency Constraint
 
 1. Canonical article name: Markovian Semantic Adjacency Constraint  
 2. App mode ID: `semantic-constrained`  

@@ -1,4 +1,4 @@
-# 05 — Pipeline and Manifest System
+# 05 - Pipeline and Manifest System
 
 ## Objective
 

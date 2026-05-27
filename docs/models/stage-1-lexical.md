@@ -1,4 +1,4 @@
-# Stage 1 — Lexical Reduction Model
+# Stage 1 - Lexical Reduction Model
 
 1. Canonical article name: Lexical Reduction Model  
 2. App mode ID: `word-based`  

@@ -1,8 +1,8 @@
-# Stage 6 — Topic-Coherent Manifold Approximation
+# Stage 6 - Topic-Coherent Manifold Approximation
 
 1. Canonical article name: Topic-Coherent Manifold / Topic-Constrained Vocabulary Model  
 2. App mode ID: `topic-coherent`  
-3. Formula: `Σ_topic (|V_topic|+P)^N`  
+3. Formula: `Σ_topic (count(V_topic) + P)^N`  
 4. Data used: explicit local topic wordsets + punctuation `. ? , !`  
 5. Class/path: `TopicCoherentGenerator` in `src/babel/generators/topic_coherent.py`  
 6. Determinism: seed-determined topic selection and deterministic token indexing  

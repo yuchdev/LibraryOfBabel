@@ -1,4 +1,4 @@
-# 22 — CLI Specification
+# 22 - CLI Specification
 
 ## Objective
 

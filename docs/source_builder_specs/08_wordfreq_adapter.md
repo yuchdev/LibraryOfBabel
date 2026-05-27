@@ -1,4 +1,4 @@
-# 08 — `wordfreq` Adapter
+# 08 - `wordfreq` Adapter
 
 ## Objective
 

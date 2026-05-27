@@ -33,7 +33,7 @@ class TopicCoherentGenerator(LibraryGenerator):
     Theoretical basis:
       - Stage 6 "Topic-Coherent Manifolds / Topic-Constrained Vocabulary Model"
     Formula:
-      - Σ_topic (|V_topic| + P)^N
+      - Σ_topic (count(V_topic) + P)^N
     Data requirements:
       - words.txt vocabulary
       - explicit local topic wordsets
@@ -53,7 +53,7 @@ class TopicCoherentGenerator(LibraryGenerator):
         stage_number=6,
         display_name="Stage 6: Topic-Coherent Manifold Approximation",
         article_model_name="Topic-Coherent Manifold / Topic-Constrained Vocabulary Model",
-        formula="Σ_topic (|V_topic| + P)^N",
+        formula="Σ_topic (count(V_topic) + P)^N",
         implementation_level="lightweight",
         required_data=["words.txt"],
         limitations=["Uses explicit local topic wordsets rather than learned embedding manifolds."],
@@ -62,7 +62,8 @@ class TopicCoherentGenerator(LibraryGenerator):
     def _topic_vocabularies(self) -> dict[str, list[str]]:
         vocab: dict[str, list[str]] = {}
         for topic, fallback in TOPIC_WORDSETS.items():
-            filtered = [word for word in self.words if word in set(fallback)]
+            fallback_set = set(fallback)
+            filtered = [word for word in self.words if word in fallback_set]
             vocab[topic] = filtered if filtered else list(fallback)
         return vocab
 

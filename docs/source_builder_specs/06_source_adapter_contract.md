@@ -1,4 +1,4 @@
-# 06 — Source Adapter Contract
+# 06 - Source Adapter Contract
 
 ## Objective
 

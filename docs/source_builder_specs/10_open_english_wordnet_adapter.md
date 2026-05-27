@@ -1,4 +1,4 @@
-# 10 — Open English WordNet Adapter
+# 10 - Open English WordNet Adapter
 
 ## Objective
 

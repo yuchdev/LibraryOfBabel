@@ -1,4 +1,4 @@
-# 19 — Semantic Markov Graph Build
+# 19 - Semantic Markov Graph Build
 
 ## Objective
 

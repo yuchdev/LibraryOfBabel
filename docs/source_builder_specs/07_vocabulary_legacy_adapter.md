@@ -1,4 +1,4 @@
-# 07 — Legacy Vocabulary Adapter
+# 07 - Legacy Vocabulary Adapter
 
 ## Objective
 

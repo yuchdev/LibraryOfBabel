@@ -1,4 +1,4 @@
-# 02 — First Mandatory Step: Extract Data Initialization from `babel.cli`
+# 02 - First Mandatory Step: Extract Data Initialization from `babel.cli`
 
 ## Objective
 

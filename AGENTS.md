@@ -1,4 +1,4 @@
-# AGENTS.md — Coding Rules for Library of Babel
+# AGENTS.md - Coding Rules for Library of Babel
 
 ## Core Rules
 

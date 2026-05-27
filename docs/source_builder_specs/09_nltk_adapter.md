@@ -1,4 +1,4 @@
-# 09 — NLTK Adapter
+# 09 - NLTK Adapter
 
 ## Objective
 

@@ -1,4 +1,4 @@
-# Stage 4 — Categorical Grammar Constraint
+# Stage 4 - Categorical Grammar Constraint
 
 1. Canonical article name: Categorical Grammar Constraint  
 2. App mode ID: `grammar-constrained`  

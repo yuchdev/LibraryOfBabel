@@ -1,3 +1,4 @@
+import math
 from pydantic import BaseModel, Field
 
 from babel.constants import (
@@ -23,6 +24,17 @@ def calculate_metrics(mode_id: str, log10_size: float) -> LibraryMetrics:
     """
     Calculate scientific notation, comparisons with Borges and universe constants.
     """
+    if math.isinf(log10_size) or math.isnan(log10_size):
+        return LibraryMetrics(
+            mode_id=mode_id,
+            log10_size=log10_size,
+            mantissa=0.0,
+            exponent=0,
+            log10_smaller_than_borges=float("inf"),
+            log10_larger_than_universe_atoms=float("-inf"),
+            log10_larger_than_planck_volumes=float("-inf"),
+        )
+
     mantissa, exponent = scientific_from_log10(log10_size)
     log10_smaller_than_borges = log10_ratio(BORGES_LOG10_SIZE, log10_size)
     log10_larger_than_universe_atoms = log10_ratio(log10_size, UNIVERSE_ATOMS_LOG10)

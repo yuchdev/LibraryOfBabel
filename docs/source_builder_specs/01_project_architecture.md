@@ -1,4 +1,4 @@
-# 01 — Project Architecture
+# 01 - Project Architecture
 
 ## Objective
 

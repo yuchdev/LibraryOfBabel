@@ -1,4 +1,4 @@
-# Library of Babel Source Builder — Specification Index
+# Library of Babel Source Builder - Specification Index
 
 ## Purpose
 

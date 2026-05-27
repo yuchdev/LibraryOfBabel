@@ -1,4 +1,4 @@
-# 12 — Project Gutenberg / SPGC Adapter
+# 12 - Project Gutenberg / SPGC Adapter
 
 ## Objective
 

@@ -1,4 +1,4 @@
-# 24 — Definition of Done
+# 24 - Definition of Done
 
 ## Full Project Completion Criteria
 

@@ -1,4 +1,4 @@
-# Stage 2 — Syntactic Reduction (Punctuation Constraint)
+# Stage 2 - Syntactic Reduction (Punctuation Constraint)
 
 1. Canonical article name: Syntactic Reduction Model (Punctuation Constraint)  
 2. App mode ID: `punctuation-constrained`  

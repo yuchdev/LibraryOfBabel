@@ -1,4 +1,4 @@
-# 04 — DuckDB Schema Version 1
+# 04 - DuckDB Schema Version 1
 
 ## Objective
 

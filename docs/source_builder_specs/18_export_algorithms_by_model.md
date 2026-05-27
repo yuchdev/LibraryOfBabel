@@ -1,10 +1,10 @@
-# 18 — Export Algorithms by Model
+# 18 - Export Algorithms by Model
 
 ## Objective
 
 Define how DuckDB data is transformed into runtime artifacts for the first five models.
 
-## Model 1 — Lexical Reduction
+## Model 1 - Lexical Reduction
 
 ### Inputs
 
@@ -39,7 +39,7 @@ runtime_vocabulary
 6. assign `runtime_rank`;
 7. export table and optional JSONL.
 
-## Model 2 — Syntactic Reduction
+## Model 2 - Syntactic Reduction
 
 ### Inputs
 
@@ -64,7 +64,7 @@ punctuation_transition
 3. enforce no adjacent punctuation rule;
 4. export punctuation class config.
 
-## Model 3 — Sentence Structure
+## Model 3 - Sentence Structure
 
 ### Inputs
 
@@ -91,7 +91,7 @@ terminal punctuation weights
 5. add literary profile if Gutenberg is available;
 6. add dialogue profile if OpenSubtitles/Kaggle subtitles are available.
 
-## Model 4 — Grammatical Limits
+## Model 4 - Grammatical Limits
 
 ### Inputs
 
@@ -128,7 +128,7 @@ POS-filtered vocabulary pools
    - PART
 6. export runtime templates.
 
-## Model 5 — Semantic Markov
+## Model 5 - Semantic Markov
 
 ### Inputs
 

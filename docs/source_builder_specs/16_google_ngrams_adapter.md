@@ -1,4 +1,4 @@
-# 16 — Google Books Ngram Adapter
+# 16 - Google Books Ngram Adapter
 
 ## Objective
 

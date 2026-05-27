@@ -1,4 +1,4 @@
-# 20 — Tests and Quality Gates
+# 20 - Tests and Quality Gates
 
 ## Objective
 

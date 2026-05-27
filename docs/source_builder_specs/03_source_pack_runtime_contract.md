@@ -1,4 +1,4 @@
-# 03 — Source Pack Runtime Contract
+# 03 - Source Pack Runtime Contract
 
 ## Objective
 

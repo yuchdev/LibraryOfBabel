@@ -1,4 +1,4 @@
-# Stage 0 — English-Language Borges Baseline
+# Stage 0 - English-Language Borges Baseline
 
 1. Canonical article name: English-Language Borges Baseline  
 2. App mode ID: `borges-library`  

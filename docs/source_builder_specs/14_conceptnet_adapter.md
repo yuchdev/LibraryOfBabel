@@ -1,4 +1,4 @@
-# 14 — ConceptNet Adapter
+# 14 - ConceptNet Adapter
 
 ## Objective
 

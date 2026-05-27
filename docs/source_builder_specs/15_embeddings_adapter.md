@@ -1,4 +1,4 @@
-# 15 — Embeddings Adapter: GloVe, fastText, Numberbatch
+# 15 - Embeddings Adapter: GloVe, fastText, Numberbatch
 
 ## Objective
 

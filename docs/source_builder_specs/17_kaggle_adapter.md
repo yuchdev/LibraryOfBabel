@@ -1,4 +1,4 @@
-# 17 — Kaggle Adapter
+# 17 - Kaggle Adapter
 
 ## Objective
 

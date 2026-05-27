@@ -1,10 +1,10 @@
-# 23 — Migration Plan
+# 23 - Migration Plan
 
 ## Objective
 
 Move from legacy scattered data initialization to a unified DuckDB-backed source pack without breaking existing `babel` usage.
 
-## Stage 0 — Inventory
+## Stage 0 - Inventory
 
 Tasks:
 
@@ -20,7 +20,7 @@ Deliverable:
 docs/migration/current_data_initialization_inventory.md
 ```
 
-## Stage 1 — Extract Data Initialization
+## Stage 1 - Extract Data Initialization
 
 Implement `babel-source-builder`.
 
@@ -40,13 +40,13 @@ Deliverable:
 runtime_vocabulary.jsonl
 ```
 
-## Stage 2 — Add DuckDB Schema
+## Stage 2 - Add DuckDB Schema
 
 Create schema, migrations, source registry, and legacy vocabulary export to DuckDB.
 
 `babel` may still use JSONL, but DuckDB must exist.
 
-## Stage 3 — Runtime Contract
+## Stage 3 - Runtime Contract
 
 Teach `babel` to load a source pack or DuckDB-backed runtime vocabulary.
 
@@ -57,7 +57,7 @@ Fallback order:
 3. runtime JSONL;
 4. legacy vocabulary directory with warning.
 
-## Stage 4 — Add Source Adapters One by One
+## Stage 4 - Add Source Adapters One by One
 
 Order:
 
@@ -75,7 +75,7 @@ Order:
 
 Each source must satisfy its quality gate before moving on.
 
-## Stage 5 — Build Derived Runtime Tables
+## Stage 5 - Build Derived Runtime Tables
 
 Implement:
 
@@ -87,7 +87,7 @@ grammar_template
 semantic_transition
 ```
 
-## Stage 6 — Source Pack Export
+## Stage 6 - Source Pack Export
 
 Create:
 
@@ -97,7 +97,7 @@ babel-en-v1.sourcepack
 
 `babel` loads only this pack in normal mode.
 
-## Stage 7 — Deprecate Direct Legacy Loading
+## Stage 7 - Deprecate Direct Legacy Loading
 
 Emit warning for direct legacy directory loading.
 
@@ -107,7 +107,7 @@ Document:
 babel-source-builder legacy export-runtime-vocabulary
 ```
 
-## Stage 8 — Switch Completely to DuckDB/Source Pack
+## Stage 8 - Switch Completely to DuckDB/Source Pack
 
 `babel` default behavior:
 

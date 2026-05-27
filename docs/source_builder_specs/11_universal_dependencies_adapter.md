@@ -1,4 +1,4 @@
-# 11 — Universal Dependencies Adapter
+# 11 - Universal Dependencies Adapter
 
 ## Objective
 

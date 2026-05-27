@@ -1,4 +1,4 @@
-# Stage 3 — Sentence-Structured Uniformity Constraint
+# Stage 3 - Sentence-Structured Uniformity Constraint
 
 1. Canonical article name: Sentence-Structured Uniformity Constraint  
 2. App mode ID: `sentence-structured`  
